@@ -30,7 +30,6 @@ import {
 
 const COUNTRIES = ["السعودية", "الإمارات", "مصر", "الأردن", "الكويت", "قطر", "البحرين", "عمان", "العراق", "سوريا", "لبنان", "فلسطين"];
 
-// المناطق/المحافظات لكل دولة
 const REGIONS_BY_COUNTRY = {
   "السعودية": ["الرياض", "مكة المكرمة", "المدينة المنورة", "الشرقية", "عسير", "تبوك", "القصيم", "حائل", "جازان", "نجران", "الباحة", "الجوف", "الحدود الشمالية"],
   "الإمارات": ["أبوظبي", "دبي", "الشارقة", "عجمان", "أم القيوين", "رأس الخيمة", "الفجيرة"],
@@ -39,7 +38,6 @@ const REGIONS_BY_COUNTRY = {
   "الكويت": ["العاصمة", "حولي", "الفروانية", "مبارك الكبير", "الأحمدي", "الجهراء"]
 };
 
-// المناطق التفصيلية لكل محافظة
 const AREAS_BY_REGION = {
   "الرياض": ["العليا", "الملقا", "النخيل", "الورود", "الربوة", "السليمانية", "الملز", "الياسمين", "النرجس"],
   "مكة المكرمة": ["العزيزية", "الشرائع", "النزهة", "المنصور", "العوالي", "الزاهر"],
@@ -82,7 +80,6 @@ export default function BrowsePage() {
   const [availableAreas, setAvailableAreas] = useState([]);
 
   useEffect(() => {
-    // Update available regions based on selected country
     if (filters.country && REGIONS_BY_COUNTRY[filters.country]) {
       setAvailableRegions(REGIONS_BY_COUNTRY[filters.country]);
     } else {
@@ -92,7 +89,6 @@ export default function BrowsePage() {
   }, [filters.country]);
 
   useEffect(() => {
-    // Update available areas based on selected region
     if (filters.region && AREAS_BY_REGION[filters.region]) {
       setAvailableAreas(AREAS_BY_REGION[filters.region]);
     } else {
@@ -116,10 +112,8 @@ export default function BrowsePage() {
     const searchLower = search.toLowerCase();
     const textLower = text.toLowerCase();
     
-    // Exact match
     if (textLower.includes(searchLower)) return true;
     
-    // Character-by-character fuzzy match
     let searchIndex = 0;
     for (let i = 0; i < textLower.length && searchIndex < searchLower.length; i++) {
       if (textLower[i] === searchLower[searchIndex]) {
@@ -173,24 +167,24 @@ export default function BrowsePage() {
   };
 
   return (
-    <div className="min-h-screen p-4 md:p-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-white">
+      <div className="max-w-7xl mx-auto p-4 md:p-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+        <div className="mb-6">
+          <h1 className="text-2xl md:text-4xl font-bold text-gray-900 mb-2">
             {getTypeTitle()}
           </h1>
-          <p className="text-gray-600">
+          <p className="text-sm md:text-base text-gray-600">
             اختر المعلم أو المركز المناسب لك من بين {filteredData.length} خيار
           </p>
         </div>
 
         {/* Type Selector */}
-        <div className="flex gap-3 mb-6 overflow-x-auto pb-2">
+        <div className="flex gap-2 md:gap-3 mb-6 overflow-x-auto pb-2">
           {[
             { id: 'online', label: 'أونلاين', icon: Video, color: 'blue' },
             { id: 'home', label: 'منزلي', icon: HomeIcon, color: 'green' },
-            { id: 'center', label: 'مركز تعليمي', icon: GraduationCap, color: 'orange' }
+            { id: 'center', label: 'مركز', icon: GraduationCap, color: 'orange' }
           ].map(type => {
             const Icon = type.icon;
             return (
@@ -198,9 +192,9 @@ export default function BrowsePage() {
                 key={type.id}
                 variant={filters.type === type.id ? "default" : "outline"}
                 onClick={() => setFilters({...filters, type: type.id})}
-                className={`flex-shrink-0 ${filters.type === type.id ? `bg-${type.color}-600 hover:bg-${type.color}-700` : ''}`}
+                className={`flex-shrink-0 text-sm ${filters.type === type.id ? `bg-${type.color}-600 hover:bg-${type.color}-700` : ''}`}
               >
-                <Icon className="w-4 h-4 ml-2" />
+                <Icon className="w-4 h-4 ml-1 md:ml-2" />
                 {type.label}
               </Button>
             );
@@ -208,26 +202,27 @@ export default function BrowsePage() {
         </div>
 
         {/* Enhanced Filters */}
-        <Card className="mb-8 border-0 shadow-lg">
-          <CardContent className="p-6">
+        <Card className="mb-6 md:mb-8 border-0 shadow-lg">
+          <CardContent className="p-4 md:p-6">
             <div className="flex items-center gap-2 mb-4">
-              <Filter className="w-5 h-5 text-gray-500" />
-              <h3 className="font-semibold text-lg">البحث والتصفية المتقدمة</h3>
+              <Filter className="w-4 h-4 md:w-5 md:h-5 text-gray-500" />
+              <h3 className="font-semibold text-base md:text-lg">البحث والتصفية</h3>
             </div>
 
-            <div className="space-y-4">
-              {/* First Row */}
-              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                <div className="relative">
-                  <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <Input
-                    placeholder="ابحث بالاسم (بحث ذكي)..."
-                    value={filters.searchText}
-                    onChange={(e) => setFilters({...filters, searchText: e.target.value})}
-                    className="pr-10"
-                  />
-                </div>
+            <div className="space-y-3 md:space-y-4">
+              {/* Search */}
+              <div className="relative">
+                <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  placeholder="ابحث بالاسم..."
+                  value={filters.searchText}
+                  onChange={(e) => setFilters({...filters, searchText: e.target.value})}
+                  className="pr-10"
+                />
+              </div>
 
+              {/* Row 1: Country & Curriculum (Mobile: side by side) */}
+              <div className="grid grid-cols-2 gap-3">
                 <Select value={filters.country} onValueChange={(value) => setFilters({...filters, country: value})}>
                   <SelectTrigger>
                     <SelectValue placeholder="الدولة" />
@@ -240,10 +235,25 @@ export default function BrowsePage() {
                   </SelectContent>
                 </Select>
 
-                {availableRegions.length > 0 && (
+                <Select value={filters.curriculum} onValueChange={(value) => setFilters({...filters, curriculum: value})}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="المنهج" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={null}>الكل</SelectItem>
+                    {CURRICULUMS.map(curriculum => (
+                      <SelectItem key={curriculum} value={curriculum}>{curriculum}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Row 2: Region & Area (if available) */}
+              {availableRegions.length > 0 && (
+                <div className="grid grid-cols-2 gap-3">
                   <Select value={filters.region} onValueChange={(value) => setFilters({...filters, region: value})}>
                     <SelectTrigger>
-                      <SelectValue placeholder="المحافظة/المنطقة" />
+                      <SelectValue placeholder="المحافظة" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value={null}>الكل</SelectItem>
@@ -252,25 +262,25 @@ export default function BrowsePage() {
                       ))}
                     </SelectContent>
                   </Select>
-                )}
 
-                {availableAreas.length > 0 && (
-                  <Select value={filters.area} onValueChange={(value) => setFilters({...filters, area: value})}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="المنطقة التفصيلية" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value={null}>الكل</SelectItem>
-                      {availableAreas.map(area => (
-                        <SelectItem key={area} value={area}>{area}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              </div>
+                  {availableAreas.length > 0 && (
+                    <Select value={filters.area} onValueChange={(value) => setFilters({...filters, area: value})}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="المنطقة" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={null}>الكل</SelectItem>
+                        {availableAreas.map(area => (
+                          <SelectItem key={area} value={area}>{area}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                </div>
+              )}
 
-              {/* Second Row */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Row 3: Stage & Subject */}
+              <div className="grid grid-cols-2 gap-3">
                 <Select value={filters.stage} onValueChange={(value) => setFilters({...filters, stage: value})}>
                   <SelectTrigger>
                     <SelectValue placeholder="المرحلة" />
@@ -294,22 +304,10 @@ export default function BrowsePage() {
                     ))}
                   </SelectContent>
                 </Select>
-
-                <Select value={filters.curriculum} onValueChange={(value) => setFilters({...filters, curriculum: value})}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="المنهج" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value={null}>الكل</SelectItem>
-                    {CURRICULUMS.map(curriculum => (
-                      <SelectItem key={curriculum} value={curriculum}>{curriculum}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
               </div>
 
-              {/* Third Row - Price and Rating */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              {/* Row 4: Price & Rating */}
+              <div className="grid grid-cols-2 gap-3">
                 <Input
                   type="number"
                   placeholder="السعر من"
@@ -322,15 +320,18 @@ export default function BrowsePage() {
                   value={filters.maxPrice}
                   onChange={(e) => setFilters({...filters, maxPrice: e.target.value})}
                 />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
                 <Select value={filters.minRating} onValueChange={(value) => setFilters({...filters, minRating: value})}>
                   <SelectTrigger>
-                    <SelectValue placeholder="التقييم الأدنى" />
+                    <SelectValue placeholder="التقييم" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value={null}>الكل</SelectItem>
-                    <SelectItem value="4">4 نجوم فأكثر</SelectItem>
-                    <SelectItem value="4.5">4.5 نجوم فأكثر</SelectItem>
-                    <SelectItem value="4.8">4.8 نجوم فأكثر</SelectItem>
+                    <SelectItem value="4">4+ نجوم</SelectItem>
+                    <SelectItem value="4.5">4.5+ نجوم</SelectItem>
+                    <SelectItem value="4.8">4.8+ نجوم</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -365,7 +366,7 @@ export default function BrowsePage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 pb-4">
             {filteredData.map((item) => (
               <Card 
                 key={item.id} 
@@ -378,7 +379,7 @@ export default function BrowsePage() {
                   }
                 }}
               >
-                <div className="relative h-48 bg-gradient-to-br from-green-500 to-emerald-600 overflow-hidden">
+                <div className="relative h-40 md:h-48 bg-gradient-to-br from-green-500 to-emerald-600 overflow-hidden">
                   {item.avatar_url || item.images?.[0] ? (
                     <img 
                       src={item.avatar_url || item.images?.[0]} 
@@ -387,7 +388,7 @@ export default function BrowsePage() {
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <div className="text-6xl font-bold text-white/30">
+                      <div className="text-5xl md:text-6xl font-bold text-white/30">
                         {item.name?.charAt(0)}
                       </div>
                     </div>
@@ -395,69 +396,69 @@ export default function BrowsePage() {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                   
                   {item.rating > 0 && (
-                    <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-1.5">
-                      <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                      <span className="font-bold text-sm">{item.rating.toFixed(1)}</span>
+                    <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm px-2 md:px-3 py-1 md:py-1.5 rounded-full flex items-center gap-1">
+                      <Star className="w-3 h-3 md:w-4 md:h-4 fill-yellow-400 text-yellow-400" />
+                      <span className="font-bold text-xs md:text-sm">{item.rating.toFixed(1)}</span>
                     </div>
                   )}
                 </div>
 
-                <CardContent className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-green-600 transition-colors">
+                <CardContent className="p-4 md:p-6">
+                  <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2 group-hover:text-green-600 transition-colors">
                     {item.name}
                   </h3>
 
                   {item.bio && (
-                    <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                    <p className="text-xs md:text-sm text-gray-600 mb-3 md:mb-4 line-clamp-2">
                       {item.bio || item.description}
                     </p>
                   )}
 
-                  <div className="flex flex-wrap gap-2 mb-4">
+                  <div className="flex flex-wrap gap-1.5 md:gap-2 mb-3 md:mb-4">
                     {(item.subjects || []).slice(0, 3).map((subject, idx) => (
-                      <Badge key={idx} variant="secondary" className="bg-green-50 text-green-700">
-                        <Book className="w-3 h-3 ml-1" />
+                      <Badge key={idx} variant="secondary" className="bg-green-50 text-green-700 text-xs">
+                        <Book className="w-2.5 h-2.5 md:w-3 md:h-3 ml-1" />
                         {subject}
                       </Badge>
                     ))}
                   </div>
 
-                  <div className="space-y-2 mb-4">
+                  <div className="space-y-1.5 md:space-y-2 mb-3 md:mb-4">
                     {item.country && (
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <MapPin className="w-4 h-4" />
-                        {item.country} {item.city && `- ${item.city}`} {item.area && `- ${item.area}`}
+                      <div className="flex items-center gap-2 text-xs md:text-sm text-gray-600">
+                        <MapPin className="w-3 h-3 md:w-4 md:h-4" />
+                        <span className="truncate">{item.country} {item.city && `- ${item.city}`}</span>
                       </div>
                     )}
 
                     {item.total_students > 0 && (
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Users className="w-4 h-4" />
+                      <div className="flex items-center gap-2 text-xs md:text-sm text-gray-600">
+                        <Users className="w-3 h-3 md:w-4 md:h-4" />
                         {item.total_students} طالب
                       </div>
                     )}
 
                     {item.years_experience && (
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <GraduationCap className="w-4 h-4" />
+                      <div className="flex items-center gap-2 text-xs md:text-sm text-gray-600">
+                        <GraduationCap className="w-3 h-3 md:w-4 md:h-4" />
                         {item.years_experience} سنوات خبرة
                       </div>
                     )}
                   </div>
 
-                  <div className="flex items-center justify-between pt-4 border-t">
-                    <div className="flex items-center gap-2">
-                      <DollarSign className="w-5 h-5 text-green-600" />
-                      <span className="text-2xl font-bold text-gray-900">
+                  <div className="flex items-center justify-between pt-3 md:pt-4 border-t">
+                    <div className="flex items-center gap-1 md:gap-2">
+                      <DollarSign className="w-4 h-4 md:w-5 md:h-5 text-green-600" />
+                      <span className="text-xl md:text-2xl font-bold text-gray-900">
                         {item.hourly_rate || item.price_per_month}
                       </span>
-                      <span className="text-sm text-gray-600">
+                      <span className="text-xs md:text-sm text-gray-600">
                         {filters.type === 'center' ? 'شهرياً' : 'ساعة'}
                       </span>
                     </div>
 
-                    <Button size="sm" className="bg-green-600 hover:bg-green-700">
-                      عرض التفاصيل
+                    <Button size="sm" className="bg-green-600 hover:bg-green-700 text-xs md:text-sm">
+                      التفاصيل
                     </Button>
                   </div>
                 </CardContent>

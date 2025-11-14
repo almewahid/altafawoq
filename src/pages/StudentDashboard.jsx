@@ -258,14 +258,23 @@ export default function StudentDashboard() {
   ];
 
   return (
-    <div className="p-4 md:p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-white">
+      <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-6 md:space-y-8">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
             مرحباً، {user?.full_name}
           </h1>
-          <p className="text-gray-600">إليك نظرة عامة على تقدمك الدراسي</p>
+          <p className="text-sm md:text-base text-gray-600">إليك نظرة عامة على تقدمك الدراسي</p>
+          
+          {/* Progress Tracking Link */}
+          <Button
+            onClick={() => navigate(createPageUrl("StudentProgress"))}
+            className="mt-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+          >
+            <TrendingUp className="w-4 h-4 ml-2" />
+            عرض تقدمي التفصيلي
+          </Button>
         </div>
 
         {/* Stats Cards */}

@@ -18,6 +18,8 @@ import CenterAdminDashboard from './pages/CenterAdminDashboard';
 import TeacherWallet from './pages/TeacherWallet';
 import TeacherCalendar from './pages/TeacherCalendar';
 import StudentCalendar from './pages/StudentCalendar';
+import GroupDetails from './pages/GroupDetails';
+import StudentProgress from './pages/StudentProgress';
 import Layout from './Layout.jsx';
 
 
@@ -42,6 +44,8 @@ export const PAGES = {
     "TeacherWallet": TeacherWallet,
     "TeacherCalendar": TeacherCalendar,
     "StudentCalendar": StudentCalendar,
+    "GroupDetails": GroupDetails,
+    "StudentProgress": StudentProgress,
 }
 
 export const pagesConfig = {
