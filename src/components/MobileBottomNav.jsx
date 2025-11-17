@@ -187,9 +187,9 @@ export default function MobileBottomNav() {
                     }}
                   />
                   
-                  {/* Icon */}
+                  {/* Icon - Larger */}
                   <item.icon 
-                    className={`w-6 h-6 relative z-10 transition-all duration-300 ${
+                    className={`w-7 h-7 relative z-10 transition-all duration-300 ${
                       isActive ? 'scale-110' : 'scale-100'
                     }`}
                     style={{ 

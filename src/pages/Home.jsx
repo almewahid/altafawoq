@@ -89,7 +89,7 @@ export default function HomePage() {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50" style={{ paddingBottom: user ? '80px' : '0' }}>
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
         {/* Header */}
         <div className="bg-white/80 backdrop-blur-sm border-b border-orange-100">
           <div className="px-3 md:max-w-7xl md:mx-auto md:px-6 lg:px-8 py-2 md:py-6">
@@ -117,7 +117,7 @@ export default function HomePage() {
         </div>
 
         {/* Main Content */}
-        <div className="px-3 md:max-w-7xl md:mx-auto md:px-6 lg:px-8 py-3 md:py-12">
+        <div className="px-3 md:max-w-7xl md:mx-auto md:px-6 lg:px-8 py-3 md:py-12 pb-20 md:pb-12">
           <div className="text-center mb-3 md:mb-12">
             <h2 className="text-xl md:text-4xl font-bold text-gray-900 mb-1 md:mb-4">
               اختر الخدمة المناسبة لك
@@ -186,8 +186,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Mobile Bottom Nav - Only on Home page */}
-      <MobileBottomNav />
+      {user && <MobileBottomNav />}
     </>
   );
 }
