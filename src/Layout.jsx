@@ -1,7 +1,6 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { base44 } from "@/api/base44Client";
 import { 
   Home, 
   Users, 
@@ -13,7 +12,8 @@ import {
   LogOut,
   GraduationCap,
   Calendar,
-  Wallet
+  Wallet,
+  FileText
 } from "lucide-react";
 import {
   Sidebar,
@@ -27,32 +27,25 @@ import {
   SidebarHeader,
   SidebarFooter,
   SidebarProvider,
-  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
-import { useQuery } from "@tanstack/react-query";
 import NotificationBadge from "@/components/NotificationBadge";
 import MobileBottomNav from "@/components/MobileBottomNav";
+import { signOutUser } from "@/firebase";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Layout({ children, currentPageName }) {
   const location = useLocation();
   const navigate = useNavigate();
-  const [user, setUser] = React.useState(null);
+  const { currentUser, userType } = useAuth();
 
-  const { data: userData } = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me(),
-    retry: false,
-  });
-
-  React.useEffect(() => {
-    if (userData) {
-      setUser(userData);
+  const handleLogout = async () => {
+    try {
+      await signOutUser();
+      navigate("/login");
+    } catch (err) {
+      console.error("فشل تسجيل الخروج:", err);
     }
-  }, [userData]);
-
-  const handleLogout = () => {
-    base44.auth.logout(createPageUrl("Home"));
   };
 
   const getNavigationItems = () => {
@@ -64,93 +57,147 @@ export default function Layout({ children, currentPageName }) {
       }
     ];
 
-    if (user?.user_type === "teacher") {
-      return [
-        ...baseItems,
-        {
-          title: "لوحة التحكم",
-          url: createPageUrl("TeacherDashboard"),
-          icon: LayoutDashboard,
-        },
-        {
-          title: "المجموعات",
-          url: createPageUrl("TeacherGroups"),
-          icon: Users,
-        },
-        {
-          title: "المحفظة",
-          url: createPageUrl("TeacherWallet"),
-          icon: Wallet,
-        },
-        {
-          title: "الجدول",
-          url: createPageUrl("TeacherCalendar"),
-          icon: Calendar,
-        },
-        {
-          title: "الكوبونات",
-          url: createPageUrl("TeacherCoupons"),
-          icon: Tag,
-        },
-        {
-          title: "الدردشة",
-          url: createPageUrl("Chat"),
-          icon: MessageSquare,
-          badge: true,
-        },
-      ];
-    } else if (user?.user_type === "center") {
-      return [
-        ...baseItems,
-        {
-          title: "لوحة التحكم",
-          url: createPageUrl("CenterDashboard"),
-          icon: LayoutDashboard,
-        },
-        {
-          title: "الدردشة",
-          url: createPageUrl("Chat"),
-          icon: MessageSquare,
-          badge: true,
-        },
-      ];
-    } else if (user?.user_type === "student") {
-      return [
-        ...baseItems,
-        {
-          title: "لوحتي",
-          url: createPageUrl("StudentDashboard"),
-          icon: LayoutDashboard,
-        },
-        {
-          title: "الواجبات",
-          url: createPageUrl("StudentAssignments"),
-          icon: BookOpen,
-        },
-        {
-          title: "الجدول",
-          url: createPageUrl("StudentCalendar"),
-          icon: Calendar,
-        },
-        {
-          title: "الدردشة",
-          url: createPageUrl("Chat"),
-          icon: MessageSquare,
-          badge: true,
-        },
-      ];
-    } else if (user?.role === "admin") {
-      return [
-        ...baseItems,
-        {
-          title: "لوحة الإدارة",
-          url: createPageUrl("AdminDashboard"),
-          icon: Settings,
-        },
-      ];
-    }
+    // قائمة المعلم
+    const teacherItems = [
+      {
+        title: "لوحة التحكم",
+        url: createPageUrl("TeacherDashboard"),
+        icon: LayoutDashboard,
+      },
+      {
+        title: "المجموعات",
+        url: createPageUrl("TeacherGroups"),
+        icon: Users,
+      },
+      {
+        title: "الدروس",
+        url: createPageUrl("TeacherLessons"),
+        icon: BookOpen,
+      },
+      {
+        title: "الواجبات",
+        url: createPageUrl("TeacherAssignments"),
+        icon: FileText,
+      },
+      {
+        title: "الجدول",
+        url: createPageUrl("TeacherCalendar"),
+        icon: Calendar,
+      },
+      {
+        title: "المحفظة",
+        url: createPageUrl("TeacherWallet"),
+        icon: Wallet,
+      },
+      {
+        title: "الكوبونات",
+        url: createPageUrl("TeacherCoupons"),
+        icon: Tag,
+      },
+      {
+        title: "الدردشة",
+        url: createPageUrl("Chat"),
+        icon: MessageSquare,
+        badge: true,
+      },
+      {
+        title: "الإعدادات",
+        url: createPageUrl("Settings"),
+        icon: Settings,
+      },
+    ];
 
-    return baseItems;
+    // قائمة الطالب
+    const studentItems = [
+      {
+        title: "لوحتي",
+        url: createPageUrl("StudentDashboard"),
+        icon: LayoutDashboard,
+      },
+      {
+        title: "الدروس",
+        url: createPageUrl("StudentLessons"),
+        icon: BookOpen,
+      },
+      {
+        title: "الواجبات",
+        url: createPageUrl("StudentAssignments"),
+        icon: FileText,
+      },
+      {
+        title: "الجدول",
+        url: createPageUrl("StudentCalendar"),
+        icon: Calendar,
+      },
+      {
+        title: "الدردشة",
+        url: createPageUrl("Chat"),
+        icon: MessageSquare,
+        badge: true,
+      },
+      {
+        title: "الإعدادات",
+        url: createPageUrl("Settings"),
+        icon: Settings,
+      },
+    ];
+
+    // قائمة مركز تعليمي
+    const centerItems = [
+      {
+        title: "لوحة التحكم",
+        url: createPageUrl("CenterDashboard"),
+        icon: LayoutDashboard,
+      },
+      {
+        title: "المعلمين",
+        url: createPageUrl("CenterTeachers"),
+        icon: Users,
+      },
+      {
+        title: "الدردشة",
+        url: createPageUrl("Chat"),
+        icon: MessageSquare,
+        badge: true,
+      },
+    ];
+
+    // قائمة الإدارة
+    const adminItems = [
+      {
+        title: "لوحة الإدارة",
+        url: createPageUrl("AdminDashboard"),
+        icon: Settings,
+      },
+      {
+        title: "المستخدمين",
+        url: createPageUrl("AdminUsers"),
+        icon: Users,
+      },
+      {
+        title: "التقارير",
+        url: createPageUrl("AdminReports"),
+        icon: FileText,
+      },
+    ];
+
+    let additionalItems = [];
+    if (userType === "teacher") additionalItems = teacherItems;
+    else if (userType === "student") additionalItems = studentItems;
+    else if (userType === "center") additionalItems = centerItems;
+    else if (userType === "admin") additionalItems = adminItems;
+
+    return [...baseItems, ...additionalItems];
+  };
+
+  const getUserTypeLabel = () => {
+    const labels = {
+      teacher: "معلم",
+      student: "طالب",
+      center: "مركز تعليمي",
+      admin: "إدارة",
+    };
+    return labels[userType] || "مستخدم";
   };
 
   return (
@@ -167,7 +214,7 @@ export default function Layout({ children, currentPageName }) {
         }
       `}</style>
 
-      {user ? (
+      {currentUser ? (
         <SidebarProvider>
           <div className="min-h-screen flex w-full">
             <Sidebar side="right" className="border-l border-orange-100 bg-white/80 backdrop-blur-sm">
@@ -218,12 +265,12 @@ export default function Layout({ children, currentPageName }) {
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-amber-500 rounded-full flex items-center justify-center">
                       <span className="text-white font-bold text-sm">
-                        {user?.full_name?.charAt(0) || 'م'}
+                        {currentUser?.email?.charAt(0) || 'م'}
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-gray-900 text-sm truncate">{user?.full_name}</p>
-                      <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                      <p className="font-medium text-gray-900 text-sm truncate">{currentUser?.email}</p>
+                      <p className="text-xs text-gray-500 truncate">{getUserTypeLabel()}</p>
                     </div>
                   </div>
                   <Button 
