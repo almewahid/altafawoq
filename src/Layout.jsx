@@ -69,16 +69,18 @@ export default function Layout({ children, currentPageName }) {
         url: createPageUrl("TeacherGroups"),
         icon: Users,
       },
-      {
-        title: "الدروس",
-        url: createPageUrl("TeacherLessons"),
-        icon: BookOpen,
-      },
-      {
-        title: "الواجبات",
-        url: createPageUrl("TeacherAssignments"),
-        icon: FileText,
-      },
+      // ❌ الدروس - مخفي مؤقتاً (الصفحة غير موجودة)
+      // {
+      //   title: "الدروس",
+      //   url: createPageUrl("TeacherLessons"),
+      //   icon: BookOpen,
+      // },
+      // ❌ الواجبات - مخفي مؤقتاً (الصفحة غير موجودة)
+      // {
+      //   title: "الواجبات",
+      //   url: createPageUrl("TeacherAssignments"),
+      //   icon: FileText,
+      // },
       {
         title: "الجدول",
         url: createPageUrl("TeacherCalendar"),
@@ -100,11 +102,12 @@ export default function Layout({ children, currentPageName }) {
         icon: MessageSquare,
         badge: true,
       },
-      {
-        title: "الإعدادات",
-        url: createPageUrl("Settings"),
-        icon: Settings,
-      },
+      // ❌ الإعدادات - مخفي مؤقتاً (الصفحة غير موجودة)
+      // {
+      //   title: "الإعدادات",
+      //   url: createPageUrl("Settings"),
+      //   icon: Settings,
+      // },
     ];
 
     // قائمة الطالب
@@ -114,11 +117,12 @@ export default function Layout({ children, currentPageName }) {
         url: createPageUrl("StudentDashboard"),
         icon: LayoutDashboard,
       },
-      {
-        title: "الدروس",
-        url: createPageUrl("StudentLessons"),
-        icon: BookOpen,
-      },
+      // ❌ الدروس - مخفي مؤقتاً (الصفحة غير موجودة)
+      // {
+      //   title: "الدروس",
+      //   url: createPageUrl("StudentLessons"),
+      //   icon: BookOpen,
+      // },
       {
         title: "الواجبات",
         url: createPageUrl("StudentAssignments"),
@@ -135,11 +139,12 @@ export default function Layout({ children, currentPageName }) {
         icon: MessageSquare,
         badge: true,
       },
-      {
-        title: "الإعدادات",
-        url: createPageUrl("Settings"),
-        icon: Settings,
-      },
+      // ❌ الإعدادات - مخفي مؤقتاً (الصفحة غير موجودة)
+      // {
+      //   title: "الإعدادات",
+      //   url: createPageUrl("Settings"),
+      //   icon: Settings,
+      // },
     ];
 
     // قائمة مركز تعليمي
@@ -215,7 +220,7 @@ export default function Layout({ children, currentPageName }) {
       `}</style>
 
       {currentUser ? (
-        <SidebarProvider>
+        <SidebarProvider defaultOpen={true} className="[&_[data-sidebar-overlay]]:hidden">
           <div className="min-h-screen flex w-full">
             <Sidebar side="right" className="border-l border-orange-100 bg-white/80 backdrop-blur-sm">
               <SidebarHeader className="border-b border-orange-100 p-6">

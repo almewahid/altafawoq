@@ -28,9 +28,9 @@ export default function Login() {
   };
 
   return (
-    <div style={{ maxWidth: "400px", margin: "50px auto", padding: "20px" }}>
-      <h2>تسجيل الدخول</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+    <div style={{ maxWidth: "400px", margin: "50px auto", padding: "20px", backgroundColor: "white", borderRadius: "10px", boxShadow: "0 2px 10px rgba(0,0,0,0.1)" }}>
+      <h2 style={{ textAlign: "center", marginBottom: "20px" }}>تسجيل الدخول</h2>
+      {error && <p style={{ color: "red", backgroundColor: "#fee", padding: "10px", borderRadius: "5px" }}>{error}</p>}
       
       <form onSubmit={handleEmailLogin}>
         <input
@@ -38,7 +38,7 @@ export default function Login() {
           placeholder="البريد الإلكتروني"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          style={{ width: "100%", padding: "10px", margin: "10px 0" }}
+          style={{ width: "100%", padding: "10px", margin: "10px 0", border: "1px solid #ddd", borderRadius: "5px" }}
           required
         />
         <input
@@ -46,23 +46,46 @@ export default function Login() {
           placeholder="كلمة المرور"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          style={{ width: "100%", padding: "10px", margin: "10px 0" }}
+          style={{ width: "100%", padding: "10px", margin: "10px 0", border: "1px solid #ddd", borderRadius: "5px" }}
           required
         />
-        <button type="submit" style={{ width: "100%", padding: "10px" }}>
+        <button 
+          type="submit" 
+          style={{ 
+            width: "100%", 
+            padding: "12px", 
+            backgroundColor: "#22c55e", 
+            color: "white", 
+            border: "none", 
+            borderRadius: "5px", 
+            cursor: "pointer",
+            fontWeight: "bold"
+          }}
+        >
           دخول
         </button>
       </form>
-
+      
+      <div style={{ margin: "15px 0", textAlign: "center", color: "#999" }}>أو</div>
+      
       <button
         onClick={handleGoogleLogin}
-        style={{ width: "100%", padding: "10px", marginTop: "10px" }}
+        style={{ 
+          width: "100%", 
+          padding: "12px", 
+          backgroundColor: "#fff", 
+          color: "#333",
+          border: "1px solid #ddd",
+          borderRadius: "5px",
+          cursor: "pointer",
+          fontWeight: "bold"
+        }}
       >
         دخول بجوجل
       </button>
-
-      <p style={{ marginTop: "20px" }}>
-        ليس لديك حساب؟ <a href="/register">سجل الآن</a>
+      
+      <p style={{ marginTop: "20px", textAlign: "center" }}>
+        ليس لديك حساب؟ <a href="/register" style={{ color: "#22c55e", textDecoration: "none" }}>سجل الآن</a>
       </p>
     </div>
   );
