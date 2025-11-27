@@ -162,7 +162,7 @@ export default function BrowsePage() {
 
   const getTypeTitle = () => {
     if (filters.type === 'online') return 'المدرسون عبر الإنترنت';
-    if (filters.type === 'home') return 'المدرسون المنزليون';
+    if (filters.type === 'home') return 'المدرسون المنازل';
     return 'المراكز التعليمية';
   };
 
