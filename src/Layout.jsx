@@ -31,7 +31,7 @@ import {
 import { Button } from "@/components/ui/button";
 import NotificationBadge from "@/components/NotificationBadge";
 import MobileBottomNav from "@/components/MobileBottomNav";
-import { signOutUser } from "@/firebase";
+import { supabase } from "@/components/SupabaseClient";
 import { useAuth } from "@/context/AuthContext";
 
 export default function Layout({ children, currentPageName }) {
@@ -40,13 +40,13 @@ export default function Layout({ children, currentPageName }) {
   const { currentUser, userType } = useAuth();
 
   const handleLogout = async () => {
-    try {
-      await signOutUser();
-      navigate("/login");
-    } catch (err) {
-      console.error("فشل تسجيل الخروج:", err);
-    }
-  };
+  try {
+    await supabase.auth.signOut();
+    navigate("/login");
+  } catch (err) {
+    console.error("فشل تسجيل الخروج:", err);
+  }
+};
 
   const getNavigationItems = () => {
     const baseItems = [

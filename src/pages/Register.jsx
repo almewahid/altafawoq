@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { signUpEmail, signInWithGoogle, ensureUserDoc } from "../firebase";
-import { doc, setDoc } from "firebase/firestore";
-import { db } from "../firebase";
+
 
 export default function Register() {
   const [email, setEmail] = useState("");

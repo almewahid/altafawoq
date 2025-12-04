@@ -1,6 +1,6 @@
 // src/pages/AuthPage.jsx
 import React, { useState } from "react";
-import { signUpEmail, signInEmail, signInWithGoogle, signInAnon } from "../firebase";
+
 
 export default function AuthPage() {
   const [mode, setMode] = useState("login");

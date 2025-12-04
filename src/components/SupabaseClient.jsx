@@ -1,11 +1,21 @@
-const SUPABASE_URL = 'https://jwfawrdwlhixjjyxposq.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp3ZmF3cmR3bGhpeGpqeXhwb3NxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0MTY4MDUsImV4cCI6MjA3OTk5MjgwNX0.2_bFNg5P616a33CNI_aEjgbKyZlQkmam2R4bOMh2Lck';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  console.error('❌ Missing Supabase environment variables!');
+  console.error('VITE_SUPABASE_URL:', supabaseUrl);
+  console.error('VITE_SUPABASE_ANON_KEY:', supabaseKey ? '✅ exists' : '❌ missing');
+  throw new Error('Supabase configuration is missing. Please check your .env.local file');
+}
+
+console.log('✅ Supabase client initialized successfully');
 
 const getHeaders = (token = null) => {
   const headers = {
-    'apikey': SUPABASE_KEY,
+    'apikey': supabaseKey,
     'Content-Type': 'application/json',
-    'Prefer': 'return=representation'
+    'Prefer': 'return=representation',
+    'x-application-name': 'altafawoq'
   };
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
@@ -17,7 +27,7 @@ export const supabase = {
   auth: {
     signUp: async ({ email, password, options }) => {
       try {
-        const response = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
+        const response = await fetch(`${supabaseUrl}/auth/v1/signup`, {
           method: 'POST',
           headers: getHeaders(),
           body: JSON.stringify({ email, password, data: options?.data }),
@@ -26,175 +36,294 @@ export const supabase = {
         if (!response.ok) throw data;
         return { data, error: null };
       } catch (error) {
+        console.error('❌ Sign up error:', error);
         return { data: null, error };
       }
     },
+    
     signInWithPassword: async ({ email, password }) => {
       try {
-        const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+        const response = await fetch(`${supabaseUrl}/auth/v1/token?grant_type=password`, {
           method: 'POST',
           headers: getHeaders(),
           body: JSON.stringify({ email, password }),
         });
         const data = await response.json();
         if (!response.ok) throw data;
-        // Save session
-        localStorage.setItem('sb-session', JSON.stringify(data));
+        
+        localStorage.setItem('sb-auth-token', JSON.stringify(data));
+        console.log('✅ User signed in successfully');
+        
         return { data: { session: data, user: data.user }, error: null };
       } catch (error) {
+        console.error('❌ Sign in error:', error);
         return { data: null, error };
       }
     },
+    
     signOut: async () => {
-      const session = JSON.parse(localStorage.getItem('sb-session'));
+      const session = JSON.parse(localStorage.getItem('sb-auth-token') || 'null');
       if (session?.access_token) {
-        await fetch(`${SUPABASE_URL}/auth/v1/logout`, {
-          method: 'POST',
-          headers: getHeaders(session.access_token),
-        });
+        try {
+          await fetch(`${supabaseUrl}/auth/v1/logout`, {
+            method: 'POST',
+            headers: getHeaders(session.access_token),
+          });
+          console.log('✅ User signed out successfully');
+        } catch (error) {
+          console.error('⚠️ Sign out error:', error);
+        }
       }
-      localStorage.removeItem('sb-session');
+      localStorage.removeItem('sb-auth-token');
       return { error: null };
     },
+    
     getSession: () => {
-      const session = localStorage.getItem('sb-session');
+      const session = localStorage.getItem('sb-auth-token');
       return { data: { session: session ? JSON.parse(session) : null }, error: null };
     },
+    
     getUser: async () => {
-      const sessionStr = localStorage.getItem('sb-session');
+      const sessionStr = localStorage.getItem('sb-auth-token');
       if (!sessionStr) return { data: { user: null }, error: null };
       
       const session = JSON.parse(sessionStr);
       try {
-        const response = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+        const response = await fetch(`${supabaseUrl}/auth/v1/user`, {
           headers: getHeaders(session.access_token),
         });
         const user = await response.json();
         if (!response.ok) throw user;
         return { data: { user }, error: null };
       } catch (error) {
+        console.error('❌ Get user error:', error);
         return { data: { user: null }, error };
       }
     },
+    
     getCurrentUserWithProfile: async () => {
       const { data: { user }, error } = await supabase.auth.getUser();
       if (error || !user) return null;
       
-      // Fetch profile from user_profiles table
       try {
-          const session = JSON.parse(localStorage.getItem('sb-session'));
-          const response = await fetch(`${SUPABASE_URL}/rest/v1/user_profiles?id=eq.${user.id}&select=*`, {
-             headers: { ...getHeaders(session.access_token), 'Accept': 'application/vnd.pgrst.object+json' }
-          });
-          
-          let profile = {};
-          if (response.ok) {
-             const profiles = await response.json();
-             if (profiles && profiles.length > 0) {
-                profile = profiles[0];
-             }
-          }
-
+        const session = JSON.parse(localStorage.getItem('sb-auth-token') || 'null');
+        if (!session) return user;
+        
+        const response = await fetch(`${supabaseUrl}/rest/v1/user_profiles?id=eq.${user.id}`, {
+          headers: { ...getHeaders(session.access_token), 'Accept': 'application/vnd.pgrst.object+json' }
+        });
+        
+        if (response.ok) {
+          const profile = await response.json();
+          console.log('✅ User profile loaded');
           return {
             ...user,
             ...profile,
             id: user.id,
             email: user.email
           };
+        }
+        
+        return user;
       } catch (e) {
-          console.error("Error fetching profile", e);
-          return user;
+        console.error('⚠️ Error fetching profile:', e);
+        return user;
       }
+    },
+
+    onAuthStateChange: (callback) => {
+      // Simple implementation for auth state changes
+      const checkAuth = async () => {
+        const { data: { user } } = await supabase.auth.getUser();
+        callback(user ? 'SIGNED_IN' : 'SIGNED_OUT', user ? { user } : null);
+      };
+      
+      checkAuth();
+      
+      return {
+        data: {
+          subscription: {
+            unsubscribe: () => console.log('Auth listener unsubscribed')
+          }
+        }
+      };
     }
   },
+  
   from: (table) => {
-    const session = JSON.parse(localStorage.getItem('sb-session'));
-    const token = session?.access_token;
+    const getToken = () => {
+      const session = JSON.parse(localStorage.getItem('sb-auth-token') || 'null');
+      return session?.access_token;
+    };
     
     return {
-      select: async (columns = '*', { count } = {}) => {
+      select: (columns = '*', options = {}) => {
         let queryParams = `select=${columns}`;
-        if (count) queryParams += '&count=exact';
+        if (options.count) queryParams += '&count=exact';
         
         const chain = {
-             eq: async (column, value) => {
-                 const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${queryParams}&${column}=eq.${value}`, {
-                   headers: getHeaders(token)
-                 });
-                 const data = await response.json();
-                 return { data, error: response.ok ? null : data };
-             },
-             in: async (column, values) => {
-                 const valueString = values.map(v => `"${v}"`).join(',');
-                 const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${queryParams}&${column}=in.(${valueString})`, {
-                   headers: getHeaders(token)
-                 });
-                 const data = await response.json();
-                 return { data, error: response.ok ? null : data };
-             },
-             order: async (column, { ascending = true } = {}) => {
-                 const orderParam = `${column}.${ascending ? 'asc' : 'desc'}`;
-                 const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${queryParams}&order=${orderParam}`, {
-                   headers: getHeaders(token)
-                 });
-                 const data = await response.json();
-                 return { data, error: response.ok ? null : data };
-             },
-             single: async () => {
-                 const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${queryParams}&limit=1`, {
-                    headers: { ...getHeaders(token), 'Accept': 'application/vnd.pgrst.object+json' }
-                 });
-                 const data = await response.json();
-                 return { data, error: response.ok ? null : data };
-             },
-             then: (resolve, reject) => {
-                fetch(`${SUPABASE_URL}/rest/v1/${table}?${queryParams}`, { headers: getHeaders(token) })
-                  .then(r => r.json().then(d => resolve({ data: d, error: r.ok ? null : d })))
-                  .catch(e => reject(e));
-             }
+          eq: async (column, value) => {
+            const response = await fetch(`${supabaseUrl}/rest/v1/${table}?${queryParams}&${column}=eq.${value}`, {
+              headers: getHeaders(getToken())
+            });
+            const data = await response.json();
+            return { data: response.ok ? data : [], error: response.ok ? null : data };
+          },
+          
+          in: async (column, values) => {
+            const valueString = values.map(v => `"${v}"`).join(',');
+            const response = await fetch(`${supabaseUrl}/rest/v1/${table}?${queryParams}&${column}=in.(${valueString})`, {
+              headers: getHeaders(getToken())
+            });
+            const data = await response.json();
+            return { data: response.ok ? data : [], error: response.ok ? null : data };
+          },
+          
+          order: (column, options = {}) => ({
+            ...chain,
+            then: async (resolve) => {
+              const ascending = options.ascending !== false;
+              const orderParam = `${column}.${ascending ? 'asc' : 'desc'}`;
+              const response = await fetch(`${supabaseUrl}/rest/v1/${table}?${queryParams}&order=${orderParam}`, {
+                headers: getHeaders(getToken())
+              });
+              const data = await response.json();
+              resolve({ data: response.ok ? data : [], error: response.ok ? null : data });
+            }
+          }),
+          
+          limit: (count) => ({
+            ...chain,
+            then: async (resolve) => {
+              const response = await fetch(`${supabaseUrl}/rest/v1/${table}?${queryParams}&limit=${count}`, {
+                headers: getHeaders(getToken())
+              });
+              const data = await response.json();
+              resolve({ data: response.ok ? data : [], error: response.ok ? null : data });
+            }
+          }),
+          
+          single: async () => {
+            const response = await fetch(`${supabaseUrl}/rest/v1/${table}?${queryParams}&limit=1`, {
+              headers: { ...getHeaders(getToken()), 'Accept': 'application/vnd.pgrst.object+json' }
+            });
+            const data = await response.json();
+            return { data: response.ok ? data : null, error: response.ok ? null : data };
+          },
+          
+          then: (resolve) => {
+            fetch(`${supabaseUrl}/rest/v1/${table}?${queryParams}`, { 
+              headers: getHeaders(getToken()) 
+            })
+              .then(r => r.json().then(d => resolve({ data: r.ok ? d : [], error: r.ok ? null : d })))
+              .catch(e => resolve({ data: [], error: e }));
+          }
         };
+        
         return chain;
       },
+      
       insert: async (data) => {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+        const response = await fetch(`${supabaseUrl}/rest/v1/${table}`, {
           method: 'POST',
-          headers: { ...getHeaders(token), 'Prefer': 'return=representation' },
-          body: JSON.stringify(data)
+          headers: { ...getHeaders(getToken()), 'Prefer': 'return=representation' },
+          body: JSON.stringify(Array.isArray(data) ? data : [data])
         });
         const resData = await response.json();
-        return { data: resData, error: response.ok ? null : resData };
-      },
-      update: async (data) => {
-         return {
-           eq: async (column, value) => {
-             const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${column}=eq.${value}`, {
-               method: 'PATCH',
-               headers: { ...getHeaders(token), 'Prefer': 'return=representation' },
-               body: JSON.stringify(data)
-             });
-             const resData = await response.json();
-             return { data: resData, error: response.ok ? null : resData };
-           },
-           in: async (column, values) => {
-             // Bulk update not directly supported in one go via simple REST this way for IN, 
-             // but for now we only used it in loops. Implementing basic support just in case.
-             // Actually standard PostgREST doesn't support IN for PATCH easily without custom stored proc or individual calls.
-             // We will fallback to individual calls in the app logic if needed, but let's provide a dummy response or error.
-             return { error: "Bulk update via IN not supported in this lightweight client" };
-           }
-         }
-      },
-      delete: async () => {
-        return {
-           eq: async (column, value) => {
-             const response = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${column}=eq.${value}`, {
-               method: 'DELETE',
-               headers: getHeaders(token)
-             });
-             return { error: response.ok ? null : await response.json() };
-           }
+        
+        if (response.ok) {
+          console.log(`✅ Inserted into ${table}`);
+        } else {
+          console.error(`❌ Insert error in ${table}:`, resData);
         }
-      }
+        
+        return { 
+          data: response.ok ? resData : null, 
+          error: response.ok ? null : resData 
+        };
+      },
+      
+      update: (data) => ({
+        eq: async (column, value) => {
+          const response = await fetch(`${supabaseUrl}/rest/v1/${table}?${column}=eq.${value}`, {
+            method: 'PATCH',
+            headers: { ...getHeaders(getToken()), 'Prefer': 'return=representation' },
+            body: JSON.stringify(data)
+          });
+          const resData = await response.json();
+          
+          if (response.ok) {
+            console.log(`✅ Updated ${table}`);
+          } else {
+            console.error(`❌ Update error in ${table}:`, resData);
+          }
+          
+          return { 
+            data: response.ok ? resData : null, 
+            error: response.ok ? null : resData 
+          };
+        }
+      }),
+      
+      delete: () => ({
+        eq: async (column, value) => {
+          const response = await fetch(`${supabaseUrl}/rest/v1/${table}?${column}=eq.${value}`, {
+            method: 'DELETE',
+            headers: getHeaders(getToken())
+          });
+          const resData = response.ok ? null : await response.json();
+          
+          if (response.ok) {
+            console.log(`✅ Deleted from ${table}`);
+          } else {
+            console.error(`❌ Delete error in ${table}:`, resData);
+          }
+          
+          return { error: resData };
+        }
+      })
     };
+  },
+  
+  storage: {
+    from: (bucket) => ({
+      upload: async (path, file) => {
+        const session = JSON.parse(localStorage.getItem('sb-auth-token') || 'null');
+        const token = session?.access_token;
+        
+        try {
+          const response = await fetch(`${supabaseUrl}/storage/v1/object/${bucket}/${path}`, {
+            method: 'POST',
+            headers: {
+              'apikey': supabaseKey,
+              'Authorization': `Bearer ${token}`,
+            },
+            body: file
+          });
+          
+          const data = await response.json();
+          if (!response.ok) throw data;
+          
+          console.log(`✅ File uploaded to ${bucket}/${path}`);
+          
+          return { 
+            data: { 
+              path: data.Key || path,
+              fullPath: `${supabaseUrl}/storage/v1/object/public/${bucket}/${path}`
+            }, 
+            error: null 
+          };
+        } catch (error) {
+          console.error('❌ Upload error:', error);
+          return { data: null, error };
+        }
+      },
+      
+      getPublicUrl: (path) => ({
+        data: {
+          publicUrl: `${supabaseUrl}/storage/v1/object/public/${bucket}/${path}`
+        }
+      })
+    })
   }
 };
