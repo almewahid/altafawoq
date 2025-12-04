@@ -1,7 +1,8 @@
 import React from "react";
+// Mobile Bottom Navigation Component
 import { Link, useLocation } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { base44 } from "@/api/base44Client";
+import { supabase } from "@/components/SupabaseClient";
 import { useQuery } from "@tanstack/react-query";
 import {
   Home,
@@ -20,7 +21,7 @@ export default function MobileBottomNav() {
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me(),
+    queryFn: () => supabase.auth.getCurrentUserWithProfile(),
     retry: false,
   });
 

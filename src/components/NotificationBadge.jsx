@@ -1,5 +1,5 @@
 import React from "react";
-import { base44 } from "@/api/base44Client";
+import { supabase } from "@/components/SupabaseClient";
 import { useQuery } from "@tanstack/react-query";
 import { Bell } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 export default function NotificationBadge() {
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me(),
+    queryFn: () => supabase.auth.getCurrentUserWithProfile(),
     retry: false,
   });
 
@@ -15,18 +15,26 @@ export default function NotificationBadge() {
     queryKey: ['unreadCount', user?.email],
     queryFn: async () => {
       if (!user?.email) return 0;
-      const received = await base44.entities.Message.filter({ 
-        receiver_email: user.email,
-        is_read: false 
-      });
-      const chatMessages = await base44.entities.ChatMessage.filter({ 
-        receiver_email: user.email,
-        is_read: false 
-      });
-      return received.length + chatMessages.length;
+      
+      const { data: messages, error: msgError } = await supabase
+        .from('messages')
+        .select('*')
+        .eq('receiver_email', user.email)
+        .eq('is_read', false);
+        
+      const { data: chatMessages, error: chatError } = await supabase
+        .from('chat_messages')
+        .select('*')
+        .eq('receiver_email', user.email)
+        .eq('is_read', false);
+
+      if (msgError && msgError.code !== 'PGRST116') console.error(msgError);
+      if (chatError) console.error(chatError);
+
+      return (messages?.length || 0) + (chatMessages?.length || 0);
     },
     enabled: !!user?.email,
-    refetchInterval: 30000, // Refresh every 30 seconds
+    refetchInterval: 30000,
   });
 
   if (unreadMessages === 0) return null;

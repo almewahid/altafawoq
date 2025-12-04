@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
+import { supabase } from "@/components/SupabaseClient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -33,18 +33,34 @@ export default function NotificationCenter() {
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me(),
+    queryFn: () => supabase.auth.getCurrentUserWithProfile(),
   });
 
   const { data: notifications = [] } = useQuery({
     queryKey: ['notifications', user?.email],
-    queryFn: () => base44.entities.Notification.filter({ user_email: user?.email }, '-created_date', 50),
+    queryFn: async () => {
+      if (!user?.email) return [];
+      const { data, error } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('user_email', user.email)
+        .order('created_date', { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      return data;
+    },
     enabled: !!user?.email,
     refetchInterval: 30000,
   });
 
   const markAsReadMutation = useMutation({
-    mutationFn: (id) => base44.entities.Notification.update(id, { is_read: true }),
+    mutationFn: async (id) => {
+      const { error } = await supabase
+        .from('notifications')
+        .update({ is_read: true })
+        .eq('id', id);
+      if (error) throw error;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries(['notifications']);
     },
@@ -53,7 +69,13 @@ export default function NotificationCenter() {
   const markAllAsReadMutation = useMutation({
     mutationFn: async () => {
       const unread = notifications.filter(n => !n.is_read);
-      await Promise.all(unread.map(n => base44.entities.Notification.update(n.id, { is_read: true })));
+      if (unread.length === 0) return;
+      
+      const { error } = await supabase
+        .from('notifications')
+        .update({ is_read: true })
+        .in('id', unread.map(n => n.id));
+      if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['notifications']);
@@ -61,13 +83,18 @@ export default function NotificationCenter() {
   });
 
   const deleteNotificationMutation = useMutation({
-    mutationFn: (id) => base44.entities.Notification.delete(id),
+    mutationFn: async (id) => {
+      const { error } = await supabase
+        .from('notifications')
+        .delete()
+        .eq('id', id);
+      if (error) throw error;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries(['notifications']);
     },
   });
 
-  // Request notification permission on mount
   useEffect(() => {
     if ('Notification' in window) {
       setPermission(Notification.permission);
@@ -80,7 +107,6 @@ export default function NotificationCenter() {
     }
   }, []);
 
-  // Show browser notifications for new unread notifications
   useEffect(() => {
     if (!user?.email || !notifications.length) return;
     if (!('Notification' in window) || Notification.permission !== 'granted') return;
@@ -89,23 +115,27 @@ export default function NotificationCenter() {
     const latestUnread = unreadNotifications[0];
 
     if (latestUnread && latestUnread.priority === 'urgent') {
-      const notification = new Notification(latestUnread.title, {
-        body: latestUnread.message,
-        icon: '/favicon.ico',
-        badge: '/favicon.ico',
-        tag: latestUnread.id,
-        requireInteraction: true,
-        vibrate: [200, 100, 200]
-      });
+        const created = new Date(latestUnread.created_date);
+        const now = new Date();
+        if (now - created < 60000) {
+             const notification = new Notification(latestUnread.title, {
+                body: latestUnread.message,
+                icon: '/favicon.ico',
+                badge: '/favicon.ico',
+                tag: latestUnread.id,
+                requireInteraction: true,
+                vibrate: [200, 100, 200]
+              });
 
-      notification.onclick = () => {
-        window.focus();
-        if (latestUnread.link) {
-          navigate(latestUnread.link);
+              notification.onclick = () => {
+                window.focus();
+                if (latestUnread.link) {
+                  navigate(latestUnread.link);
+                }
+                setOpen(true);
+                notification.close();
+              };
         }
-        setOpen(true);
-        notification.close();
-      };
     }
   }, [notifications, user?.email, navigate]);
 
