@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { base44 } from "@/api/base44Client";
+import { supabase } from "@/components/SupabaseClient";
 import { useQuery } from "@tanstack/react-query";
 import { 
   Video, 
@@ -22,11 +22,7 @@ export default function HomePage() {
   const { data: userData } = useQuery({
     queryKey: ['currentUser'],
     queryFn: async () => {
-      try {
-        return await base44.auth.me();
-      } catch {
-        return null;
-      }
+      return await supabase.auth.getCurrentUserWithProfile();
     },
     retry: false,
   });
@@ -45,7 +41,7 @@ export default function HomePage() {
   }, []);
 
   const handleLogin = () => {
-    base44.auth.redirectToLogin(createPageUrl("Home"));
+    navigate(createPageUrl("UserLogin"));
   };
 
   const teachingCategories = [

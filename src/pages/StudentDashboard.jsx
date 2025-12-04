@@ -1,11 +1,10 @@
-
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { supabase } from "@/components/SupabaseClient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { format } from 'date-fns';
-import { ar } from 'date-fns/locale'; // Import Arabic locale
+import { ar } from 'date-fns/locale';
 import {
   BookOpen,
   Calendar,
@@ -19,9 +18,9 @@ import {
   Plus,
   Edit,
   Trash2,
-  Bell, // Added Bell icon
-  MessageCircle, // Added MessageCircle icon
-  Video // Added Video icon for upcoming sessions
+  Bell,
+  MessageCircle,
+  Video
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -62,18 +61,30 @@ export default function StudentDashboard() {
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me(),
+    queryFn: () => supabase.auth.getCurrentUserWithProfile(),
   });
 
   const { data: enrollments = [] } = useQuery({
     queryKey: ['studentEnrollments', user?.email],
-    queryFn: () => base44.entities.Enrollment.filter({ student_email: user?.email }),
+    queryFn: async () => {
+      if (!user?.email) return [];
+      const { data, error } = await supabase
+        .from('enrollments')
+        .select('*')
+        .eq('student_email', user.email);
+      if (error) throw error;
+      return data;
+    },
     enabled: !!user?.email,
   });
 
   const { data: allGroups = [] } = useQuery({
     queryKey: ['allGroups'],
-    queryFn: () => base44.entities.StudyGroup.list(),
+    queryFn: async () => {
+      const { data, error } = await supabase.from('study_groups').select('*');
+      if (error) throw error;
+      return data;
+    },
   });
 
   const { data: assignments = [] } = useQuery({
@@ -83,21 +94,42 @@ export default function StudentDashboard() {
       const groupIds = enrollments.map(e => e.group_id);
       if (groupIds.length === 0) return [];
       
-      const allAssignments = await base44.entities.Assignment.list('-created_date');
-      return allAssignments.filter(a => groupIds.includes(a.group_id));
+      const { data, error } = await supabase
+        .from('assignments')
+        .select('*')
+        .order('created_date', { ascending: false });
+        
+      if (error) throw error;
+      return data.filter(a => groupIds.includes(a.group_id));
     },
     enabled: !!user?.email && enrollments.length > 0,
   });
 
   const { data: submissions = [] } = useQuery({
     queryKey: ['studentSubmissions', user?.email],
-    queryFn: () => base44.entities.AssignmentSubmission.filter({ student_email: user?.email }),
+    queryFn: async () => {
+      if (!user?.email) return [];
+      const { data, error } = await supabase
+        .from('assignment_submissions')
+        .select('*')
+        .eq('student_email', user.email);
+      if (error) throw error;
+      return data;
+    },
     enabled: !!user?.email,
   });
 
   const { data: personalGoals = [] } = useQuery({
     queryKey: ['personalGoals', user?.email],
-    queryFn: () => base44.entities.PersonalGoal.filter({ student_email: user?.email }),
+    queryFn: async () => {
+      if (!user?.email) return [];
+      const { data, error } = await supabase
+        .from('personal_goals')
+        .select('*')
+        .eq('student_email', user.email);
+      if (error) throw error;
+      return data;
+    },
     enabled: !!user?.email,
   });
 
@@ -105,8 +137,10 @@ export default function StudentDashboard() {
     queryKey: ['learningObjectives', user?.email],
     queryFn: async () => {
       if (!user?.email) return [];
-      const allObjectives = await base44.entities.LearningObjective.list();
-      return allObjectives.filter(obj => 
+      const { data, error } = await supabase.from('learning_objectives').select('*');
+      if (error) throw error;
+      
+      return data.filter(obj => 
         obj.student_email === user?.email || 
         enrollments.some(e => e.group_id === obj.group_id && !obj.student_email)
       );
@@ -121,8 +155,13 @@ export default function StudentDashboard() {
       const groupIds = enrollments.map(e => e.group_id);
       if (groupIds.length === 0) return [];
       
-      const allAnnouncements = await base44.entities.Announcement.list('-created_date');
-      return allAnnouncements.filter(a => 
+      const { data, error } = await supabase
+        .from('announcements')
+        .select('*')
+        .order('created_date', { ascending: false });
+      if (error) throw error;
+
+      return data.filter(a => 
         groupIds.includes(a.group_id) && 
         (!a.student_email || a.student_email === user?.email)
       ).slice(0, 5);
@@ -137,8 +176,13 @@ export default function StudentDashboard() {
       const groupIds = enrollments.map(e => e.group_id);
       if (groupIds.length === 0) return [];
       
-      const allSessions = await base44.entities.VideoSession.list('-scheduled_date');
-      return allSessions.filter(s => {
+      const { data, error } = await supabase
+        .from('video_sessions')
+        .select('*')
+        .order('scheduled_date', { ascending: false });
+      if (error) throw error;
+
+      return data.filter(s => {
         if (!groupIds.includes(s.group_id)) return false;
         if (s.status !== 'scheduled') return false;
         
@@ -150,11 +194,18 @@ export default function StudentDashboard() {
   });
 
   const createGoalMutation = useMutation({
-    mutationFn: (data) => base44.entities.PersonalGoal.create({
-      ...data,
-      student_email: user?.email,
-      status: 'active'
-    }),
+    mutationFn: async (data) => {
+      const { data: newGoal, error } = await supabase
+        .from('personal_goals')
+        .insert([{
+          ...data,
+          student_email: user?.email,
+          status: 'active'
+        }])
+        .select();
+      if (error) throw error;
+      return newGoal;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries(['personalGoals']);
       setShowGoalDialog(false);
@@ -169,17 +220,31 @@ export default function StudentDashboard() {
   });
 
   const updateGoalProgressMutation = useMutation({
-    mutationFn: ({ id, progress }) => base44.entities.PersonalGoal.update(id, { 
-      progress_percentage: progress,
-      status: progress >= 100 ? 'completed' : 'active'
-    }),
+    mutationFn: async ({ id, progress }) => {
+      const { data: updated, error } = await supabase
+        .from('personal_goals')
+        .update({ 
+          progress_percentage: progress,
+          status: progress >= 100 ? 'completed' : 'active'
+        })
+        .eq('id', id)
+        .select();
+      if (error) throw error;
+      return updated;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries(['personalGoals']);
     },
   });
 
   const deleteGoalMutation = useMutation({
-    mutationFn: (id) => base44.entities.PersonalGoal.delete(id),
+    mutationFn: async (id) => {
+      const { error } = await supabase
+        .from('personal_goals')
+        .delete()
+        .eq('id', id);
+      if (error) throw error;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries(['personalGoals']);
     },
@@ -219,12 +284,6 @@ export default function StudentDashboard() {
     }
     return acc;
   }, []);
-
-  const assignmentStats = [
-    { name: 'مسلمة', value: submissions.length },
-    { name: 'معلقة', value: pendingAssignments.length },
-    { name: 'مقيمة', value: submissions.filter(s => s.status === 'graded').length }
-  ];
 
   const stats = [
     {
