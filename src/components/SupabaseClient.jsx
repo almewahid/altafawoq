@@ -60,6 +60,45 @@ export const supabase = {
         return { data: null, error };
       }
     },
+
+    // ✅ إضافة دالة OAuth
+    signInWithOAuth: async ({ provider, options = {} }) => {
+      try {
+        // بناء الـ redirect URL
+        const redirectTo = options.redirectTo || window.location.origin;
+        
+        // بناء الـ OAuth URL
+        const params = new URLSearchParams({
+          provider: provider,
+          redirect_to: redirectTo,
+        });
+
+        // إضافة query params إضافية
+        if (options.queryParams) {
+          Object.entries(options.queryParams).forEach(([key, value]) => {
+            params.append(key, value);
+          });
+        }
+
+        // إضافة scopes
+        if (options.scopes) {
+          params.append('scopes', options.scopes);
+        }
+
+        const oauthUrl = `${supabaseUrl}/auth/v1/authorize?${params.toString()}`;
+        
+        console.log('✅ Redirecting to OAuth provider:', provider);
+        
+        // إعادة توجيه المستخدم
+        window.location.href = oauthUrl;
+        
+        // لا نعيد شيء لأن الصفحة ستُعاد توجيهها
+        return { data: { url: oauthUrl, provider }, error: null };
+      } catch (error) {
+        console.error('❌ OAuth error:', error);
+        return { data: null, error };
+      }
+    },
     
     signOut: async () => {
       const session = JSON.parse(localStorage.getItem('sb-auth-token') || 'null');
@@ -79,6 +118,29 @@ export const supabase = {
     },
     
     getSession: () => {
+      // التحقق من وجود session في URL (OAuth callback)
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const accessToken = hashParams.get('access_token');
+      const refreshToken = hashParams.get('refresh_token');
+      
+      if (accessToken) {
+        // حفظ الـ session من OAuth callback
+        const oauthSession = {
+          access_token: accessToken,
+          refresh_token: refreshToken,
+          token_type: hashParams.get('token_type') || 'bearer',
+          expires_in: parseInt(hashParams.get('expires_in') || '3600'),
+        };
+        
+        localStorage.setItem('sb-auth-token', JSON.stringify(oauthSession));
+        
+        // تنظيف الـ URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+        
+        return { data: { session: oauthSession }, error: null };
+      }
+      
+      // جلب من localStorage
       const session = localStorage.getItem('sb-auth-token');
       return { data: { session: session ? JSON.parse(session) : null }, error: null };
     },
@@ -132,10 +194,21 @@ export const supabase = {
     },
 
     onAuthStateChange: (callback) => {
-      // Simple implementation for auth state changes
+      // فحص عند التحميل
       const checkAuth = async () => {
-        const { data: { user } } = await supabase.auth.getUser();
-        callback(user ? 'SIGNED_IN' : 'SIGNED_OUT', user ? { user } : null);
+        // فحص OAuth callback أولاً
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const accessToken = hashParams.get('access_token');
+        
+        if (accessToken) {
+          // OAuth callback
+          const { data: { user } } = await supabase.auth.getUser();
+          callback('SIGNED_IN', user ? { user } : null);
+        } else {
+          // فحص عادي
+          const { data: { user } } = await supabase.auth.getUser();
+          callback(user ? 'SIGNED_IN' : 'SIGNED_OUT', user ? { user } : null);
+        }
       };
       
       checkAuth();
@@ -207,6 +280,19 @@ export const supabase = {
             const response = await fetch(`${supabaseUrl}/rest/v1/${table}?${queryParams}&limit=1`, {
               headers: { ...getHeaders(getToken()), 'Accept': 'application/vnd.pgrst.object+json' }
             });
+            const data = await response.json();
+            return { data: response.ok ? data : null, error: response.ok ? null : data };
+          },
+          
+          maybeSingle: async () => {
+            const response = await fetch(`${supabaseUrl}/rest/v1/${table}?${queryParams}&limit=1`, {
+              headers: { ...getHeaders(getToken()), 'Accept': 'application/vnd.pgrst.object+json' }
+            });
+            
+            if (response.status === 404) {
+              return { data: null, error: null };
+            }
+            
             const data = await response.json();
             return { data: response.ok ? data : null, error: response.ok ? null : data };
           },
