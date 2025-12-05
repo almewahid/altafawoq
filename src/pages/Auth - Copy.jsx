@@ -123,15 +123,18 @@ export default function Auth() {
     }
   };
 
-  // الجديد:
-const handleGoogleLogin = async () => {
-  try {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/`
-      }
-    });
+  const handleGoogleLogin = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          }
+        }
+      });
       if (error) throw error;
     } catch (err) {
       setError("فشل تسجيل الدخول بـ Google");
