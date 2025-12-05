@@ -56,7 +56,8 @@ export function AuthProvider({ children }) {
         .from('user_profiles')
         .select('user_type')
         .eq('id', user.id)
-        .single();
+        .limit(1)
+.maybeSingle();
       
       if (error) {
         console.error("خطأ في جلب بيانات المستخدم:", error);
