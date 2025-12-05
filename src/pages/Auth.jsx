@@ -23,11 +23,28 @@ export default function Auth() {
       
       if (accessToken) {
         console.log('✅ Google OAuth callback detected');
-        setMessage({ type: 'success', text: 'جاري تسجيل الدخول...' });
+        setMessage({ type: 'success', text: 'جاري التحقق من الحساب...' });
         
-        // انتظر قليلاً لـ AuthContext
-        setTimeout(() => {
-          navigate('/home');
+        // انتظر للحصول على بيانات المستخدم
+        setTimeout(async () => {
+          const { data: { user } } = await supabase.auth.getUser();
+          
+          if (user) {
+            // تحقق من user_type
+            const { data: profile } = await supabase
+              .from('user_profiles')
+              .select('user_type')
+              .eq('id', user.id)
+              .maybeSingle();
+            
+            if (!profile?.user_type || profile.user_type === 'student') {
+              // مستخدم جديد أو لم يختر نوع الحساب
+              navigate('/completeprofile');
+            } else {
+              // مستخدم قديم، اذهب للـ home
+              navigate('/home');
+            }
+          }
         }, 1000);
       }
     };
@@ -124,11 +141,11 @@ export default function Auth() {
         } else {
           setMessage({ 
             type: 'success', 
-            text: 'تم إنشاء الحساب! جاري تسجيل الدخول...' 
+            text: 'تم إنشاء الحساب! الآن اختر نوع حسابك...' 
           });
           
           setTimeout(() => {
-            navigate('/home');
+            navigate('/completeprofile');
           }, 1000);
         }
       }
