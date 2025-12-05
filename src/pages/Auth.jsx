@@ -54,10 +54,30 @@ export default function Auth() {
 
   // إعادة توجيه المستخدمين المسجلين
   useEffect(() => {
-    if (isAuthenticated) {
-      const from = location.state?.from?.pathname || '/home';
-      navigate(from);
-    }
+    const checkUserTypeAndRedirect = async () => {
+      if (isAuthenticated) {
+        // تحقق من user_type
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (user) {
+          const { data: profile } = await supabase
+            .from('user_profiles')
+            .select('user_type')
+            .eq('id', user.id)
+            .maybeSingle();
+          
+          // إذا لم يكن له user_type أو كان student فقط (افتراضي)
+          if (!profile?.user_type) {
+            navigate('/completeprofile');
+          } else {
+            const from = location.state?.from?.pathname || '/home';
+            navigate(from);
+          }
+        }
+      }
+    };
+
+    checkUserTypeAndRedirect();
   }, [isAuthenticated, navigate, location]);
 
   const handleGoogleLogin = async () => {
