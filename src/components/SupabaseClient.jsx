@@ -11,7 +11,16 @@ const getHeaders = (token = null) => {
   // Get token from storage if not provided
   if (!token) {
     const session = localStorage.getItem('sb-session');
-    
+    if (session) {
+      try {
+        const parsed = JSON.parse(session);
+        if (parsed?.access_token) {
+          token = parsed.access_token;
+        }
+      } catch (e) {
+        console.error("Error parsing session", e);
+      }
+    }
   }
 
   if (token) {
