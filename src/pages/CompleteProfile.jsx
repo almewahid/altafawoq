@@ -10,14 +10,37 @@ import { createPageUrl } from "@/utils";
 export default function CompleteProfile() {
   const navigate = useNavigate();
   const [role, setRole] = useState("");
+  const [loading, setLoading] = useState(false);
   
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const user = await supabase.auth.getUser();
-    if (user.data.user) {
-      await supabase.from('user_profiles').update({ user_type: role }).eq('id', user.data.user.id);
-      navigate(createPageUrl("Home"));
-      window.location.reload();
+    setLoading(true);
+    
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        const { error } = await supabase
+          .from('user_profiles')
+          .update({ user_type: role })
+          .eq('id', user.id);
+        
+        if (error) {
+          console.error('❌ Update error:', error);
+          alert('حدث خطأ في الحفظ');
+          setLoading(false);
+          return;
+        }
+        
+        console.log('✅ User type updated to:', role);
+        
+        // إعادة تحميل الصفحة لتحديث AuthContext
+        window.location.href = '/home';
+      }
+    } catch (err) {
+      console.error('❌ Error:', err);
+      alert('حدث خطأ');
+      setLoading(false);
     }
   };
 
@@ -42,8 +65,12 @@ export default function CompleteProfile() {
                 </SelectContent>
               </Select>
             </div>
-            <Button type="submit" className="w-full bg-green-600" disabled={!role}>
-              حفظ ومتابعة
+            <Button 
+              type="submit" 
+              className="w-full bg-green-600" 
+              disabled={!role || loading}
+            >
+              {loading ? 'جاري الحفظ...' : 'حفظ ومتابعة'}
             </Button>
           </form>
         </CardContent>
