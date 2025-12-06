@@ -13,39 +13,11 @@ export default function CompleteProfile() {
   
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (user) {
-        // Update user_profiles table
-        const { error } = await supabase
-          .from('user_profiles')
-          .update({ 
-            user_type: role,
-            role: 'user' // Ensure basic role is set
-          })
-          .eq('id', user.id);
-
-        if (error) {
-          console.error("Error updating profile:", error);
-          alert("حدث خطأ أثناء حفظ البيانات. يرجى المحاولة مرة أخرى.");
-          return;
-        }
-
-        // Force a small delay to ensure DB propagation
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // Navigate based on role
-        if (role === 'teacher') {
-          window.location.href = createPageUrl("TeacherDashboard");
-        } else if (role === 'center') {
-          window.location.href = createPageUrl("CenterDashboard");
-        } else {
-          window.location.href = createPageUrl("StudentDashboard");
-        }
-      }
-    } catch (err) {
-      console.error("Complete profile error:", err);
+    const user = await supabase.auth.getUser();
+    if (user.data.user) {
+      await supabase.from('user_profiles').update({ user_type: role }).eq('id', user.data.user.id);
+      navigate(createPageUrl("Home"));
+      window.location.reload();
     }
   };
 
