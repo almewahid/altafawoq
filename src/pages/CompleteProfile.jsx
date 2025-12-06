@@ -10,29 +10,32 @@ import { createPageUrl } from "@/utils";
 export default function CompleteProfile() {
   const navigate = useNavigate();
   const [role, setRole] = useState("");
+  const [loading, setLoading] = useState(false);
   
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (user) {
-        // Update user_profiles table
+        // Update user_profiles table with ONLY user_type
         const { error } = await supabase
           .from('user_profiles')
-          .update({ 
-            user_type: role,
-            role: 'user' // Ensure basic role is set
-          })
+          .update({ user_type: role })
           .eq('id', user.id);
 
         if (error) {
           console.error("Error updating profile:", error);
           alert("حدث خطأ أثناء حفظ البيانات. يرجى المحاولة مرة أخرى.");
+          setLoading(false);
           return;
         }
 
-        // Force a small delay to ensure DB propagation
+        console.log('✅ User type updated to:', role);
+        
+        // Force reload to update AuthContext
         await new Promise(resolve => setTimeout(resolve, 500));
         
         // Navigate based on role
@@ -46,6 +49,8 @@ export default function CompleteProfile() {
       }
     } catch (err) {
       console.error("Complete profile error:", err);
+      alert("حدث خطأ. يرجى المحاولة مرة أخرى.");
+      setLoading(false);
     }
   };
 
@@ -59,7 +64,7 @@ export default function CompleteProfile() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <label>نوع الحساب</label>
-              <Select value={role} onValueChange={setRole}>
+              <Select value={role} onValueChange={setRole} disabled={loading}>
                 <SelectTrigger>
                   <SelectValue placeholder="اختر نوع الحساب" />
                 </SelectTrigger>
@@ -70,8 +75,12 @@ export default function CompleteProfile() {
                 </SelectContent>
               </Select>
             </div>
-            <Button type="submit" className="w-full bg-green-600" disabled={!role}>
-              حفظ ومتابعة
+            <Button 
+              type="submit" 
+              className="w-full bg-green-600 hover:bg-green-700" 
+              disabled={!role || loading}
+            >
+              {loading ? 'جاري الحفظ...' : 'حفظ ومتابعة'}
             </Button>
           </form>
         </CardContent>
