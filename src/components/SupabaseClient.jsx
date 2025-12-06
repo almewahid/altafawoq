@@ -1,3 +1,4 @@
+// Force rebuild Sat Dec  6 04:43:50 EST 2025
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
