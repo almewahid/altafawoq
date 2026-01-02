@@ -142,10 +142,7 @@ export default function HomePage() {
                     alt={category.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />
-                  <div className={`absolute inset-0 bg-gradient-to-br ${category.gradient} opacity-80 group-hover:opacity-90 transition-opacity duration-500`}></div>
                   
-                  <div className={`absolute inset-0 flex items-center justify-center`}>
-                    <category.icon className="w-10 h-10 md:w-16 md:h-16 text-white" />
                   </div>
                 </div>
                 
