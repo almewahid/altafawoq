@@ -51,7 +51,7 @@ export default function HomePage() {
       description: "تعلم من منزلك مع أفضل المعلمين عبر الإنترنت",
       icon: Video,
       gradient: "from-blue-500 to-cyan-600",
-      image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=300&fit=crop",
+      image: "https://res.cloudinary.com/dufjbywcm/image/upload/v1767365478/Online_teacher_azc5ye.png",
       features: ["دروس تفاعلية", "مرونة في المواعيد", "توفير الوقت والجهد"]
     },
     {
