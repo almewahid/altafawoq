@@ -60,7 +60,7 @@ export default function HomePage() {
       description: "معلم خاص يأتي إلى منزلك لتعليم شخصي مباشر",
       icon: Home,
       gradient: "from-green-500 to-emerald-600",
-      image: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400&h=300&fit=crop",
+      image: "https://res.cloudinary.com/dufjbywcm/image/upload/v1767365477/Home_teacher_pb3x42.png",
       features: ["تعليم وجهاً لوجه", "اهتمام شخصي", "جدول مخصص"]
     },
     {
