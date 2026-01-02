@@ -80,7 +80,22 @@ export default function HomePage() {
       gradient: "from-purple-500 to-pink-600",
       image: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=400&h=300&fit=crop",
       features: ["أبحاث علمية", "عروض تقديمية", "حل واجبات"]
-    }
+
+         {id: "scientific_research", image: "https://res.cloudinary.com/dufjbywcm/image/upload/v1767365483/Scientific_research_egcg45.png"},
+ {id: "solve_assignments", image: "https://res.cloudinary.com/dufjbywcm/image/upload/v1767365484/Solve_assignments_r9uncg.png"},
+ {id: "sessions", image: "https://res.cloudinary.com/dufjbywcm/image/upload/v1767365483/Sessions_wlbx2f.png"},
+ {id: "progress_rate", image: "https://res.cloudinary.com/dufjbywcm/image/upload/v1767365481/Progress_rate_gpsviq.png"},
+ {id: "presentation", image: "https://res.cloudinary.com/dufjbywcm/image/upload/v1767365480/Progresentation_gulzij.png"},
+ {id: "personal_goals", image: "https://res.cloudinary.com/dufjbywcm/image/upload/v1767365479/personal_goals_komreh.png"},
+ {id: "groups_progress", image: "https://res.cloudinary.com/dufjbywcm/image/upload/v1767365476/Groups_progress_v6jukb.png"},
+ {id: "find_teacher", image: "https://res.cloudinary.com/dufjbywcm/image/upload/v1767365475/Find_teacher_mfychb.png"},
+ {id: "educational_services", image: "https://res.cloudinary.com/dufjbywcm/image/upload/v1767365474/Educational_services_bfcd7m.png"},
+ {id: "educational_objectives", image: "https://res.cloudinary.com/dufjbywcm/image/upload/v1767365474/Educational_objectives_zjcjog.png"},
+ {id: "educational_center", image: "https://res.cloudinary.com/dufjbywcm/image/upload/v1767365472/Educational_center_owuixr.png"},
+ {id: "distribution_materials", image: "https://res.cloudinary.com/dufjbywcm/image/upload/v1767365472/Distribution_materials_ln9i1l.png"},
+ {id: "active_groups", image: "https://res.cloudinary.com/dufjbywcm/image/upload/v1767365471/Active_groups_afvv45.png"},
+ {id: "chat", image: "https://res.cloudinary.com/dufjbywcm/image/upload/v1767365471/Chat_jhzx7q.png"},
+ {id: "summaries", image: "https://res.cloudinary.com/dufjbywcm/image/upload/v1767365470/Summaries_e9y4xz.png"},
   ];
 
   return (
