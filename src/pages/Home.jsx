@@ -59,7 +59,7 @@ export default function HomePage() {
       title: "مدرس منزلي",
       description: "معلم خاص يأتي إلى منزلك لتعليم شخصي مباشر",
       icon: Home,
-      gradient: "",
+      
       image: "https://res.cloudinary.com/dufjbywcm/image/upload/v1767365477/Home_teacher_pb3x42.png",
       features: ["تعليم وجهاً لوجه", "اهتمام شخصي", "جدول مخصص"]
     },
