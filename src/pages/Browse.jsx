@@ -41,35 +41,64 @@ export default function Browse() {
         centers: []
       };
 
+      // جلب المجموعات
       if (filters.entity_type === "all" || filters.entity_type === "group") {
         let groupQuery = supabase.from('study_groups').select('*').eq('status', 'active');
+        
         if (search) {
           groupQuery = groupQuery.or(`name.ilike.%${search}%,subject.ilike.%${search}%,description.ilike.%${search}%`);
         }
         if (filters.subject !== "all") groupQuery = groupQuery.eq('subject', filters.subject);
         if (filters.stage !== "all") groupQuery = groupQuery.eq('stage', filters.stage);
         if (filters.curriculum !== "all") groupQuery = groupQuery.eq('curriculum', filters.curriculum);
-        const { data } = await groupQuery.order('created_at', { ascending: false });
-        fetchedData.groups = data || [];
+        
+        const { data, error } = await groupQuery.order('created_at', { ascending: false });
+        if (!error) fetchedData.groups = data || [];
       }
 
+      // جلب المعلمين
       if (filters.entity_type === "all" || filters.entity_type === "teacher") {
         let teacherQuery = supabase.from('teacher_profiles').select('*').eq('is_approved', true);
+        
         if (search) {
           teacherQuery = teacherQuery.or(`name.ilike.%${search}%,bio.ilike.%${search}%`);
         }
-        if (filters.teaching_type !== "all") teacherQuery = teacherQuery.contains('teaching_type', [filters.teaching_type]);
-        const { data } = await teacherQuery.order('created_at', { ascending: false });
-        fetchedData.teachers = data || [];
+        if (filters.subject !== "all") {
+          teacherQuery = teacherQuery.contains('subjects', [filters.subject]);
+        }
+        if (filters.stage !== "all") {
+          teacherQuery = teacherQuery.contains('stages', [filters.stage]);
+        }
+        if (filters.curriculum !== "all") {
+          teacherQuery = teacherQuery.contains('curriculum', [filters.curriculum]);
+        }
+        if (filters.teaching_type !== "all") {
+          teacherQuery = teacherQuery.contains('teaching_type', [filters.teaching_type]);
+        }
+        
+        const { data, error } = await teacherQuery.order('created_at', { ascending: false });
+        if (!error) fetchedData.teachers = data || [];
       }
 
+      // جلب المراكز
       if (filters.entity_type === "all" || filters.entity_type === "center") {
         let centerQuery = supabase.from('educational_centers').select('*').eq('is_approved', true);
+        
         if (search) {
           centerQuery = centerQuery.or(`name.ilike.%${search}%,description.ilike.%${search}%`);
         }
-        const { data } = await centerQuery.order('created_at', { ascending: false });
-        fetchedData.centers = data || [];
+        if (filters.subject !== "all") {
+          centerQuery = centerQuery.contains('subjects', [filters.subject]);
+        }
+        if (filters.stage !== "all") {
+          centerQuery = centerQuery.contains('stages', [filters.stage]);
+        }
+        if (filters.curriculum !== "all") {
+          centerQuery = centerQuery.contains('curriculum', [filters.curriculum]);
+        }
+        
+        const { data, error } = await centerQuery.order('created_at', { ascending: false });
+        if (!error) fetchedData.centers = data || [];
       }
 
       return fetchedData;
@@ -83,11 +112,13 @@ export default function Browse() {
     ...teachers.flatMap(t => t.subjects || []),
     ...centers.flatMap(c => c.subjects || []),
   ])].filter(Boolean);
+  
   const allStages = [...new Set([
     ...groups.map(g => g.stage),
     ...teachers.flatMap(t => t.stages || []),
     ...centers.flatMap(c => c.stages || []),
   ])].filter(Boolean);
+  
   const allCurricula = [...new Set([
     ...groups.map(g => g.curriculum),
     ...teachers.flatMap(t => t.curriculum || []),
