@@ -80,7 +80,7 @@ export default function HomePage() {
       gradient: "from-purple-500 to-pink-600",
       image: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=400&h=300&fit=crop",
       features: ["أبحاث علمية", "عروض تقديمية", "حل واجبات"]
-
+}
   ];
 
   return (
