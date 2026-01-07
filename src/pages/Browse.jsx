@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/components/SupabaseClient";
 import { Input } from "@/components/ui/input";
@@ -38,93 +38,84 @@ export default function Browse() {
     retry: false,
   });
 
-  const { data: allData, isLoading } = useQuery({
-    queryKey: ['browseAll', search, filters],
+  // ✅ جلب كل البيانات بدون فلاتر
+  const { data, isLoading } = useQuery({
+    queryKey: ["browse-all-data"],
     queryFn: async () => {
-      const fetchedData = {
-        groups: [],
-        teachers: [],
-        centers: []
+      const [groups, teachers, centers] = await Promise.all([
+        supabase.from("study_groups").select("*").eq("status", "active"),
+        supabase.from("teacher_profiles").select("*").eq("is_approved", true),
+        supabase.from("educational_centers").select("*").eq("is_approved", true),
+      ]);
+
+      return {
+        groups: groups.data || [],
+        teachers: teachers.data || [],
+        centers: centers.data || [],
       };
-
-      // جلب المجموعات
-      if (filters.entity_type === "all" || filters.entity_type === "group") {
-        let groupQuery = supabase.from('study_groups').select('*').eq('status', 'active');
-        
-        if (search) {
-          groupQuery = groupQuery.or(`name.ilike.%${search}%,subject.ilike.%${search}%,description.ilike.%${search}%`);
-        }
-        if (filters.subject !== "all") groupQuery = groupQuery.eq('subject', filters.subject);
-        if (filters.stage !== "all") groupQuery = groupQuery.eq('stage', filters.stage);
-        if (filters.curriculum !== "all") groupQuery = groupQuery.eq('curriculum', filters.curriculum);
-        
-        const { data, error } = await groupQuery.order('created_at', { ascending: false });
-        if (!error) fetchedData.groups = data || [];
-      }
-
-      // جلب المعلمين
-      if (filters.entity_type === "all" || filters.entity_type === "teacher") {
-        let teacherQuery = supabase.from('teacher_profiles').select('*').eq('is_approved', true);
-        
-        if (search) {
-          teacherQuery = teacherQuery.or(`name.ilike.%${search}%,bio.ilike.%${search}%`);
-        }
-        if (filters.subject !== "all") {
-          teacherQuery = teacherQuery.overlaps('subjects', [filters.subject]);
-        }
-        if (filters.stage !== "all") {
-          teacherQuery = teacherQuery.overlaps('stages', [filters.stage]);
-        }
-        if (filters.curriculum !== "all") {
-          teacherQuery = teacherQuery.overlaps('curriculum', [filters.curriculum]);
-        }
-        if (filters.teaching_type !== "all") {
-          teacherQuery = teacherQuery.overlaps('teaching_type', [filters.teaching_type]);
-        }
-        
-        const { data, error } = await teacherQuery.order('created_at', { ascending: false });
-        if (!error) fetchedData.teachers = data || [];
-      }
-
-      // جلب المراكز
-      if (filters.entity_type === "all" || filters.entity_type === "center") {
-        let centerQuery = supabase.from('educational_centers').select('*').eq('is_approved', true);
-        
-        if (search) {
-          centerQuery = centerQuery.or(`name.ilike.%${search}%,description.ilike.%${search}%`);
-        }
-        if (filters.subject !== "all") {
-          centerQuery = centerQuery.overlaps('subjects', [filters.subject]);
-        }
-        if (filters.stage !== "all") {
-          centerQuery = centerQuery.overlaps('stages', [filters.stage]);
-        }
-        if (filters.curriculum !== "all") {
-          centerQuery = centerQuery.overlaps('curriculum', [filters.curriculum]);
-        }
-        
-        const { data, error } = await centerQuery.order('created_at', { ascending: false });
-        if (!error) fetchedData.centers = data || [];
-      }
-
-      return fetchedData;
-    }
+    },
   });
 
-  const { groups = [], teachers = [], centers = [] } = allData || {};
+  const { groups = [], teachers = [], centers = [] } = data || {};
 
+  // ✅ فلترة في JavaScript
+  const textMatch = (value, search) =>
+    value?.toString().toLowerCase().includes(search.toLowerCase());
+
+  const filteredGroups = useMemo(() => {
+    if (filters.entity_type !== "all" && filters.entity_type !== "group") return [];
+
+    return groups.filter(g =>
+      (!search ||
+        textMatch(g.name, search) ||
+        textMatch(g.subject, search) ||
+        textMatch(g.description, search)) &&
+      (filters.subject === "all" || g.subject === filters.subject) &&
+      (filters.stage === "all" || g.stage === filters.stage) &&
+      (filters.curriculum === "all" || g.curriculum === filters.curriculum)
+    );
+  }, [groups, search, filters]);
+
+  const filteredTeachers = useMemo(() => {
+    if (filters.entity_type !== "all" && filters.entity_type !== "teacher") return [];
+
+    return teachers.filter(t =>
+      (!search ||
+        textMatch(t.name, search) ||
+        textMatch(t.bio, search)) &&
+      (filters.subject === "all" || t.subjects?.includes(filters.subject)) &&
+      (filters.stage === "all" || t.stages?.includes(filters.stage)) &&
+      (filters.curriculum === "all" || t.curriculum?.includes(filters.curriculum)) &&
+      (filters.teaching_type === "all" || t.teaching_type?.includes(filters.teaching_type))
+    );
+  }, [teachers, search, filters]);
+
+  const filteredCenters = useMemo(() => {
+    if (filters.entity_type !== "all" && filters.entity_type !== "center") return [];
+
+    return centers.filter(c =>
+      (!search ||
+        textMatch(c.name, search) ||
+        textMatch(c.description, search)) &&
+      (filters.subject === "all" || c.subjects?.includes(filters.subject)) &&
+      (filters.stage === "all" || c.stages?.includes(filters.stage)) &&
+      (filters.curriculum === "all" || c.curriculum?.includes(filters.curriculum))
+    );
+  }, [centers, search, filters]);
+
+  // ✅ خيارات الفلاتر الديناميكية
   const allSubjects = [...new Set([
     ...groups.map(g => g.subject),
     ...teachers.flatMap(t => t.subjects || []),
     ...centers.flatMap(c => c.subjects || []),
   ])].filter(Boolean);
-  
+
   const allStages = [...new Set([
     ...groups.map(g => g.stage),
     ...teachers.flatMap(t => t.stages || []),
     ...centers.flatMap(c => c.stages || []),
   ])].filter(Boolean);
-  
+
   const allCurricula = [...new Set([
     ...groups.map(g => g.curriculum),
     ...teachers.flatMap(t => t.curriculum || []),
@@ -142,6 +133,7 @@ export default function Browse() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-colors duration-300 p-4 md:p-8">
       <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header */}
         <div className="flex items-center gap-4">
           <Button 
             variant="ghost" 
@@ -160,7 +152,8 @@ export default function Browse() {
             )}
           </div>
         </div>
-        
+
+        {/* Search and Filters */}
         <Card className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border-0 shadow-xl rounded-3xl transition-colors duration-300">
           <CardContent className="p-4 md:p-6">
             <div className="flex flex-col md:flex-row gap-4">
@@ -272,13 +265,14 @@ export default function Browse() {
           </CardContent>
         </Card>
 
+        {/* Results */}
         {isLoading ? (
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
           </div>
         ) : (
           <div className="space-y-8">
-            {groups.length === 0 && teachers.length === 0 && centers.length === 0 && (
+            {filteredGroups.length === 0 && filteredTeachers.length === 0 && filteredCenters.length === 0 && (
               <Card className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border-0 shadow-xl rounded-3xl transition-colors duration-300">
                 <CardContent className="p-12 text-center">
                   <p className="text-gray-500 dark:text-gray-400 text-lg transition-colors duration-300">لا توجد نتائج</p>
@@ -286,10 +280,11 @@ export default function Browse() {
               </Card>
             )}
 
-            {(filters.entity_type === "all" || filters.entity_type === "group") && groups.length > 0 && (
+            {/* Groups */}
+            {filteredGroups.length > 0 && (
               <div className="grid md:grid-cols-3 gap-6">
                 <h2 className="col-span-full text-xl font-bold text-gray-900 dark:text-white">المجموعات الدراسية</h2>
-                {groups.map((group) => (
+                {filteredGroups.map((group) => (
                   <Card 
                     key={group.id} 
                     className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer rounded-3xl overflow-hidden group"
@@ -362,10 +357,11 @@ export default function Browse() {
               </div>
             )}
 
-            {(filters.entity_type === "all" || filters.entity_type === "teacher") && teachers.length > 0 && (
+            {/* Teachers */}
+            {filteredTeachers.length > 0 && (
               <div className="grid md:grid-cols-3 gap-6">
                 <h2 className="col-span-full text-xl font-bold text-gray-900 dark:text-white mt-4">المعلمون</h2>
-                {teachers.map((teacher) => (
+                {filteredTeachers.map((teacher) => (
                   <Card 
                     key={teacher.id} 
                     className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer rounded-3xl overflow-hidden group"
@@ -444,10 +440,11 @@ export default function Browse() {
               </div>
             )}
 
-            {(filters.entity_type === "all" || filters.entity_type === "center") && centers.length > 0 && (
+            {/* Centers */}
+            {filteredCenters.length > 0 && (
               <div className="grid md:grid-cols-3 gap-6">
                 <h2 className="col-span-full text-xl font-bold text-gray-900 dark:text-white mt-4">المراكز التعليمية</h2>
-                {centers.map((center) => (
+                {filteredCenters.map((center) => (
                   <Card 
                     key={center.id} 
                     className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer rounded-3xl overflow-hidden group"
