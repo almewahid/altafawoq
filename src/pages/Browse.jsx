@@ -49,7 +49,7 @@ export default function Browse() {
         if (filters.subject !== "all") groupQuery = groupQuery.eq('subject', filters.subject);
         if (filters.stage !== "all") groupQuery = groupQuery.eq('stage', filters.stage);
         if (filters.curriculum !== "all") groupQuery = groupQuery.eq('curriculum', filters.curriculum);
-        const { data } = await groupQuery.order('created_date', { ascending: false });
+        const { data } = await groupQuery.order('created_at', { ascending: false });
         fetchedData.groups = data || [];
       }
 
@@ -59,7 +59,7 @@ export default function Browse() {
           teacherQuery = teacherQuery.or(`name.ilike.%${search}%,bio.ilike.%${search}%`);
         }
         if (filters.teaching_type !== "all") teacherQuery = teacherQuery.contains('teaching_type', [filters.teaching_type]);
-        const { data } = await teacherQuery.order('created_date', { ascending: false });
+        const { data } = await teacherQuery.order('created_at', { ascending: false });
         fetchedData.teachers = data || [];
       }
 
@@ -68,7 +68,7 @@ export default function Browse() {
         if (search) {
           centerQuery = centerQuery.or(`name.ilike.%${search}%,description.ilike.%${search}%`);
         }
-        const { data } = await centerQuery.order('created_date', { ascending: false });
+        const { data } = await centerQuery.order('created_at', { ascending: false });
         fetchedData.centers = data || [];
       }
 
@@ -165,8 +165,10 @@ export default function Browse() {
                     <SelectValue placeholder="المادة" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">جميع المواد</SelectItem>
-                    {allSubjects.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    <SelectItem value="all">كل المواد</SelectItem>
+                    {allSubjects.map((subject) => (
+                      <SelectItem key={subject} value={subject}>{subject}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
 
@@ -175,8 +177,10 @@ export default function Browse() {
                     <SelectValue placeholder="المرحلة" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">جميع المراحل</SelectItem>
-                    {allStages.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    <SelectItem value="all">كل المراحل</SelectItem>
+                    {allStages.map((stage) => (
+                      <SelectItem key={stage} value={stage}>{stage}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
 
@@ -185,41 +189,45 @@ export default function Browse() {
                     <SelectValue placeholder="المنهج" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">جميع المناهج</SelectItem>
-                    {allCurricula.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                    <SelectItem value="all">كل المناهج</SelectItem>
+                    {allCurricula.map((curriculum) => (
+                      <SelectItem key={curriculum} value={curriculum}>{curriculum}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
 
-                {(filters.entity_type === "all" || filters.entity_type === "teacher") && (
-                  <Select value={filters.teaching_type} onValueChange={(v) => setFilters({...filters, teaching_type: v})}>
-                    <SelectTrigger className="dark:bg-slate-700 dark:text-white dark:border-slate-600">
-                      <SelectValue placeholder="نوع التدريس" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">جميع الأنواع</SelectItem>
-                      <SelectItem value="online">أونلاين</SelectItem>
-                      <SelectItem value="home">منزلي</SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
+                <Select value={filters.teaching_type} onValueChange={(v) => setFilters({...filters, teaching_type: v})}>
+                  <SelectTrigger className="dark:bg-slate-700 dark:text-white dark:border-slate-600">
+                    <SelectValue placeholder="نوع التدريس" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">الكل</SelectItem>
+                    <SelectItem value="online">أونلاين</SelectItem>
+                    <SelectItem value="home">حضوري</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             )}
           </CardContent>
         </Card>
 
         {isLoading ? (
-        <div className="text-center py-12 text-gray-900 dark:text-white">جاري التحميل...</div>
-        ) : (groups.length === 0 && teachers.length === 0 && centers.length === 0) ? (
-          <Card className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border-0 shadow-xl rounded-3xl transition-colors duration-300">
-            <CardContent className="p-12 text-center">
-              <p className="text-gray-600 dark:text-gray-400 transition-colors duration-300">لا توجد نتائج</p>
-            </CardContent>
-          </Card>
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+          </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-8">
+            {groups.length === 0 && teachers.length === 0 && centers.length === 0 && (
+              <Card className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border-0 shadow-xl rounded-3xl transition-colors duration-300">
+                <CardContent className="p-12 text-center">
+                  <p className="text-gray-500 dark:text-gray-400 text-lg transition-colors duration-300">لا توجد نتائج</p>
+                </CardContent>
+              </Card>
+            )}
+
             {(filters.entity_type === "all" || filters.entity_type === "group") && groups.length > 0 && (
               <div className="grid md:grid-cols-3 gap-6">
-                <h2 className="col-span-full text-xl font-bold text-gray-900 dark:text-white mt-4">المجموعات الدراسية</h2>
+                <h2 className="col-span-full text-xl font-bold text-gray-900 dark:text-white">المجموعات الدراسية</h2>
                 {groups.map((group) => (
                   <Card 
                     key={group.id} 
@@ -232,21 +240,16 @@ export default function Browse() {
                       }
                     }}
                   >
-                    {group.image_url && (
-                      <div className="relative h-40 overflow-hidden">
-                        <img src={group.image_url} alt={group.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                      </div>
-                    )}
                     <CardContent className="p-6">
                       <div className="flex justify-between items-start mb-4">
                         <div className="flex-1">
                           <h3 className="font-bold text-lg text-gray-900 dark:text-white transition-colors duration-300 group-hover:text-green-600">
                             {group.name}
                           </h3>
-                          <p className="text-sm text-gray-500 dark:text-gray-400 transition-colors duration-300">{group.subject}</p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 transition-colors duration-300">{group.subject} - {group.stage}</p>
                         </div>
                         <Badge className="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 transition-colors duration-300">
-                          {group.stage}
+                          {group.price} د.ك
                         </Badge>
                       </div>
                       
@@ -255,14 +258,14 @@ export default function Browse() {
                       </p>
 
                       <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-4 transition-colors duration-300">
-                        {group.teaching_type?.includes('online') && <Video className="w-4 h-4" />}
-                        {group.teaching_type?.includes('home') && <HomeIcon className="w-4 h-4" />}
-                        <span>{group.teaching_type?.join(', ') || 'أونلاين'}</span>
+                        {group.is_online ? <Video className="w-4 h-4" /> : <HomeIcon className="w-4 h-4" />}
+                        <span>{group.is_online ? 'أونلاين' : 'حضوري'}</span>
+                        {group.location && <><MapPin className="w-4 h-4" /> <span>{group.location}</span></>}
                       </div>
 
                       <div className="flex items-center justify-between pt-4 border-t dark:border-slate-600 transition-colors duration-300">
                         <span className="text-green-600 dark:text-green-400 font-bold transition-colors duration-300">
-                          {isGuest ? "---" : `${group.price_per_session} د.ك`}
+                          {group.current_students}/{group.max_students} طالب
                         </span>
                         
                         {!isGuest && (
