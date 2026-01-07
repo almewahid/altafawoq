@@ -64,16 +64,16 @@ export default function Browse() {
           teacherQuery = teacherQuery.or(`name.ilike.%${search}%,bio.ilike.%${search}%`);
         }
         if (filters.subject !== "all") {
-          teacherQuery = teacherQuery.contains('subjects', [filters.subject]);
+          teacherQuery = teacherQuery.overlaps('subjects', [filters.subject]);
         }
         if (filters.stage !== "all") {
-          teacherQuery = teacherQuery.contains('stages', [filters.stage]);
+          teacherQuery = teacherQuery.overlaps('stages', [filters.stage]);
         }
         if (filters.curriculum !== "all") {
-          teacherQuery = teacherQuery.contains('curriculum', [filters.curriculum]);
+          teacherQuery = teacherQuery.overlaps('curriculum', [filters.curriculum]);
         }
         if (filters.teaching_type !== "all") {
-          teacherQuery = teacherQuery.contains('teaching_type', [filters.teaching_type]);
+          teacherQuery = teacherQuery.overlaps('teaching_type', [filters.teaching_type]);
         }
         
         const { data, error } = await teacherQuery.order('created_at', { ascending: false });
@@ -88,13 +88,13 @@ export default function Browse() {
           centerQuery = centerQuery.or(`name.ilike.%${search}%,description.ilike.%${search}%`);
         }
         if (filters.subject !== "all") {
-          centerQuery = centerQuery.contains('subjects', [filters.subject]);
+          centerQuery = centerQuery.overlaps('subjects', [filters.subject]);
         }
         if (filters.stage !== "all") {
-          centerQuery = centerQuery.contains('stages', [filters.stage]);
+          centerQuery = centerQuery.overlaps('stages', [filters.stage]);
         }
         if (filters.curriculum !== "all") {
-          centerQuery = centerQuery.contains('curriculum', [filters.curriculum]);
+          centerQuery = centerQuery.overlaps('curriculum', [filters.curriculum]);
         }
         
         const { data, error } = await centerQuery.order('created_at', { ascending: false });
