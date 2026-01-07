@@ -11,7 +11,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
 const DEFAULT_FILTERS = {
-  entity_type: "all",
+  entity_type: "teacher", // ✅ الافتراضي: معلمون فقط
   subject: "all",
   stage: "all",
   curriculum: "all",
@@ -272,6 +272,28 @@ export default function Browse() {
           </div>
         ) : (
           <div className="space-y-8">
+            {/* عدد النتائج */}
+            {(filteredGroups.length > 0 || filteredTeachers.length > 0 || filteredCenters.length > 0) && (
+              <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                <span className="font-semibold">النتائج:</span>
+                {filteredGroups.length > 0 && (
+                  <Badge variant="secondary" className="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200">
+                    {filteredGroups.length} مجموعة
+                  </Badge>
+                )}
+                {filteredTeachers.length > 0 && (
+                  <Badge variant="secondary" className="bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-200">
+                    {filteredTeachers.length} معلم
+                  </Badge>
+                )}
+                {filteredCenters.length > 0 && (
+                  <Badge variant="secondary" className="bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-200">
+                    {filteredCenters.length} مركز
+                  </Badge>
+                )}
+              </div>
+            )}
+
             {filteredGroups.length === 0 && filteredTeachers.length === 0 && filteredCenters.length === 0 && (
               <Card className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border-0 shadow-xl rounded-3xl transition-colors duration-300">
                 <CardContent className="p-12 text-center">
