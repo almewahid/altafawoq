@@ -80,7 +80,7 @@ export default function HomePage() {
       gradient: "from-purple-500 to-pink-600",
       image: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=400&h=300&fit=crop",
       features: ["أبحاث علمية", "عروض تقديمية", "حل واجبات"]
-}
+    }
   ];
 
   return (
@@ -136,42 +136,42 @@ export default function HomePage() {
                   }
                 }}
               >
-                <div className="relative h-28 md:h-48 overflow-hidden">
-                  <img 
-                    src={category.image} 
-                    alt={category.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  
+                <CardContent className="p-0">
+                  <div className="relative h-28 md:h-48 overflow-hidden">
+                    <img 
+                      src={category.image} 
+                      alt={category.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
                   </div>
-                </div>
-                
-                <CardContent className="relative p-2.5 md:p-6">
-                  <h3 className="text-xs md:text-xl font-bold text-gray-900 mb-1 md:mb-3 text-center">
-                    {category.title}
-                  </h3>
                   
-                  <p className="text-xs md:text-sm text-gray-600 mb-2 md:mb-4 text-center hidden md:block">
-                    {category.description}
-                  </p>
+                  <div className="relative p-2.5 md:p-6">
+                    <h3 className="text-xs md:text-xl font-bold text-gray-900 mb-1 md:mb-3 text-center">
+                      {category.title}
+                    </h3>
+                    
+                    <p className="text-xs md:text-sm text-gray-600 mb-2 md:mb-4 text-center hidden md:block">
+                      {category.description}
+                    </p>
 
-                  <div className="space-y-1 mb-2 md:mb-6 hidden md:block">
-                    {category.features.map((feature, idx) => (
-                      <div key={idx} className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-gray-400"></div>
-                        <span className="text-xs md:text-sm text-gray-600">
-                          {feature}
-                        </span>
-                      </div>
-                    ))}
+                    <div className="space-y-1 mb-2 md:mb-6 hidden md:block">
+                      {category.features.map((feature, idx) => (
+                        <div key={idx} className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-gray-400"></div>
+                          <span className="text-xs md:text-sm text-gray-600">
+                            {feature}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <Button 
+                      className={`w-full bg-gradient-to-r ${category.gradient} hover:opacity-90 text-white text-xs md:text-sm py-1.5 md:py-2`}
+                    >
+                      <span>تصفح</span>
+                      <ArrowLeft className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2 group-hover:translate-x-1 transition-transform" />
+                    </Button>
                   </div>
-
-                  <Button 
-                    className={`w-full bg-gradient-to-r ${category.gradient} hover:opacity-90 text-white text-xs md:text-sm py-1.5 md:py-2`}
-                  >
-                    <span>تصفح</span>
-                    <ArrowLeft className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2 group-hover:translate-x-1 transition-transform" />
-                  </Button>
                 </CardContent>
               </Card>
             ))}
