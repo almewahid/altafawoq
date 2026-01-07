@@ -12,9 +12,8 @@ import {
   LayoutDashboard,
   Calendar,
   Settings,
-  Tag,
-  Clock
-  } from "lucide-react";
+  Tag
+} from "lucide-react";
 import NotificationBadge from "@/components/NotificationBadge";
 
 export default function MobileBottomNav() {
@@ -46,16 +45,10 @@ export default function MobileBottomNav() {
           color: "#3b82f6"
         },
         {
-          title: "طلابي",
-          url: createPageUrl("TeacherStudents"),
+          title: "المجموعات",
+          url: createPageUrl("TeacherGroups"),
           icon: Users,
           color: "#8b5cf6"
-        },
-        {
-          title: "تتبع الحصص",
-          url: createPageUrl("SessionTracking"),
-          icon: Clock,
-          color: "#ef4444"
         },
         {
           title: "الجدول",
@@ -117,7 +110,7 @@ export default function MobileBottomNav() {
           color: "#ec4899"
         },
       ];
-    } else if (user?.system_role === "admin") {
+    } else if (user?.role === "admin") {
       return [
         ...baseItems,
         {
@@ -125,22 +118,6 @@ export default function MobileBottomNav() {
           url: createPageUrl("AdminDashboard"),
           icon: Settings,
           color: "#ef4444"
-        },
-        {
-          title: "لوحة المشرف",
-          url: createPageUrl("ModeratorDashboard"),
-          icon: LayoutDashboard,
-          color: "#f59e0b"
-        },
-      ];
-    } else if (user?.system_role === "moderator") {
-      return [
-        ...baseItems,
-        {
-          title: "لوحة المشرف",
-          url: createPageUrl("ModeratorDashboard"),
-          icon: LayoutDashboard,
-          color: "#f59e0b"
         },
       ];
     }
@@ -176,11 +153,6 @@ export default function MobileBottomNav() {
             backdrop-filter: blur(10px) !important;
             border-top: 1px solid rgba(251, 146, 60, 0.2) !important;
             box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08) !important;
-          }
-          
-          .dark .mobile-bottom-nav-fixed {
-            background: linear-gradient(to top, rgba(30, 41, 59, 0.98), rgba(30, 41, 59, 0.95)) !important;
-            border-top: 1px solid rgba(71, 85, 105, 0.3) !important;
           }
         }
 

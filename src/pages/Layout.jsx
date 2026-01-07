@@ -1,8 +1,7 @@
-
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
-import { base44 } from "@/api/base44Client";
+import { supabase } from "@/components/SupabaseClient";
 import { 
   Home, 
   Users, 
@@ -14,8 +13,12 @@ import {
   LogOut,
   GraduationCap,
   Calendar,
-  Wallet
-} from "lucide-react";
+  Wallet,
+  Clock,
+  Target,
+  Moon,
+  Sun
+  } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -39,10 +42,23 @@ export default function Layout({ children, currentPageName }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [user, setUser] = React.useState(null);
+  const [darkMode, setDarkMode] = React.useState(() => {
+    const saved = localStorage.getItem('darkMode');
+    return saved ? JSON.parse(saved) : false;
+  });
+
+  React.useEffect(() => {
+    localStorage.setItem('darkMode', JSON.stringify(darkMode));
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
 
   const { data: userData } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me(),
+    queryFn: () => supabase.auth.getCurrentUserWithProfile(),
     retry: false,
   });
 
@@ -52,8 +68,9 @@ export default function Layout({ children, currentPageName }) {
     }
   }, [userData]);
 
-  const handleLogout = () => {
-    base44.auth.logout(createPageUrl("Home"));
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    window.location.href = createPageUrl("Home");
   };
 
   const getNavigationItems = () => {
@@ -79,9 +96,19 @@ export default function Layout({ children, currentPageName }) {
           icon: Users,
         },
         {
+          title: "طلابي",
+          url: createPageUrl("TeacherStudents"),
+          icon: GraduationCap,
+        },
+        {
           title: "المحفظة",
           url: createPageUrl("TeacherWallet"),
           icon: Wallet,
+        },
+        {
+          title: "تتبع الحصص",
+          url: createPageUrl("SessionTracking"),
+          icon: Clock,
         },
         {
           title: "الجدول",
@@ -139,14 +166,38 @@ export default function Layout({ children, currentPageName }) {
           icon: MessageSquare,
           badge: true,
         },
+        {
+          title: "أهدافي",
+          url: createPageUrl("StudentGoals"),
+          icon: Target,
+        },
+        {
+          title: "الإعدادات",
+          url: createPageUrl("StudentSettings"),
+          icon: Settings,
+        },
       ];
-    } else if (user?.role === "admin") {
+    } else if (user?.system_role === "admin") {
       return [
         ...baseItems,
         {
           title: "لوحة الإدارة",
           url: createPageUrl("AdminDashboard"),
           icon: Settings,
+        },
+        {
+          title: "لوحة المشرف",
+          url: createPageUrl("ModeratorDashboard"),
+          icon: LayoutDashboard,
+        },
+      ];
+    } else if (user?.system_role === "moderator") {
+      return [
+        ...baseItems,
+        {
+          title: "لوحة المشرف",
+          url: createPageUrl("ModeratorDashboard"),
+          icon: LayoutDashboard,
         },
       ];
     }
@@ -155,7 +206,7 @@ export default function Layout({ children, currentPageName }) {
   };
 
   return (
-    <div dir="rtl" className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
+    <div dir="rtl" className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-colors duration-300">
       <style>{`
         :root {
           --primary: 34 197 94;
@@ -171,22 +222,32 @@ export default function Layout({ children, currentPageName }) {
       {user ? (
         <SidebarProvider>
           <div className="min-h-screen flex w-full">
-            <Sidebar side="right" className="border-l border-orange-100 bg-white/80 backdrop-blur-sm">
-              <SidebarHeader className="border-b border-orange-100 p-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <GraduationCap className="w-6 h-6 text-white" />
+            <Sidebar side="right" className="border-l border-orange-200 dark:border-slate-700 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm transition-colors duration-300">
+              <SidebarHeader className="border-b border-orange-200 dark:border-slate-700 p-6 transition-colors duration-300">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
+                      <GraduationCap className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h2 className="font-bold text-gray-900 dark:text-white text-lg transition-colors duration-300">أستاذي</h2>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 transition-colors duration-300">منصة تعليمية</p>
+                    </div>
                   </div>
-                  <div>
-                    <h2 className="font-bold text-gray-900 text-lg">أستاذي</h2>
-                    <p className="text-xs text-gray-500">منصة تعليمية</p>
-                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setDarkMode(!darkMode)}
+                    className="hover:bg-green-600 hover:text-white transition-all"
+                  >
+                    {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                  </Button>
                 </div>
               </SidebarHeader>
               
               <SidebarContent className="p-3">
                 <SidebarGroup>
-                  <SidebarGroupLabel className="text-xs font-medium text-gray-500 uppercase tracking-wider px-3 py-2">
+                  <SidebarGroupLabel className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider px-3 py-2 transition-colors duration-300">
                     القائمة
                   </SidebarGroupLabel>
                   <SidebarGroupContent>
@@ -195,8 +256,8 @@ export default function Layout({ children, currentPageName }) {
                         <SidebarMenuItem key={item.title}>
                           <SidebarMenuButton 
                             asChild 
-                            className={`hover:bg-green-50 hover:text-green-700 transition-all duration-200 rounded-xl mb-1 ${
-                              location.pathname === item.url ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md' : ''
+                            className={`hover:bg-green-600 hover:text-white transition-all duration-200 rounded-xl mb-1 ${
+                              location.pathname === item.url ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md' : 'dark:text-white'
                             }`}
                           >
                             <Link to={item.url} className="flex items-center gap-3 px-4 py-3">
@@ -214,7 +275,7 @@ export default function Layout({ children, currentPageName }) {
                 </SidebarGroup>
               </SidebarContent>
 
-              <SidebarFooter className="border-t border-orange-100 p-4">
+              <SidebarFooter className="border-t border-orange-200 dark:border-slate-700 p-4 transition-colors duration-300">
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-amber-500 rounded-full flex items-center justify-center">
@@ -223,14 +284,14 @@ export default function Layout({ children, currentPageName }) {
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-gray-900 text-sm truncate">{user?.full_name}</p>
-                      <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                      <p className="font-medium text-gray-900 dark:text-white text-sm truncate transition-colors duration-300">{user?.full_name}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate transition-colors duration-300">{user?.email}</p>
                     </div>
                   </div>
                   <Button 
                     variant="outline" 
                     onClick={handleLogout}
-                    className="w-full justify-start gap-2 hover:bg-red-50 hover:text-red-600 hover:border-red-200"
+                    className="w-full justify-start gap-2 hover:bg-red-600 hover:text-white dark:border-slate-600 dark:text-white transition-all"
                   >
                     <LogOut className="w-4 h-4" />
                     تسجيل الخروج
