@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/components/SupabaseClient";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, Users } from "lucide-react";
+import { Plus, Users, FolderOpen } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 
@@ -23,7 +23,7 @@ export default function TeacherGroups() {
     <div className="p-6 max-w-7xl mx-auto space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">مجموعاتي الدراسية</h1>
-        <Button onClick={() => {}} className="bg-green-600">
+        <Button onClick={() => navigate(createPageUrl("CreateStudyGroup"))} className="bg-green-600">
           <Plus className="w-4 h-4 ml-2" />
           مجموعة جديدة
         </Button>
@@ -45,8 +45,22 @@ export default function TeacherGroups() {
                   <span>{group.students?.length || 0} طلاب</span>
                   <span className="text-green-600">{group.price_per_session} د.ك</span>
                 </div>
-              </CardContent>
-            </Card>
+                <div className="mt-4 pt-4 border-t flex gap-2">
+                   <Button 
+                      className="flex-1 bg-blue-50 text-blue-700 hover:bg-blue-100" 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={(e) => {
+                         e.stopPropagation();
+                         navigate(createPageUrl("GroupContent") + `?id=${group.id}`);
+                      }}
+                   >
+                      <FolderOpen className="w-4 h-4 ml-2" />
+                      المحتوى
+                   </Button>
+                </div>
+                </CardContent>
+                </Card>
           ))
         )}
       </div>

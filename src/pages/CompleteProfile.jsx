@@ -14,58 +14,59 @@ export default function CompleteProfile() {
   
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!role) return;
+
     setLoading(true);
-    
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (user) {
-        // Update user_profiles table with ONLY user_type
+        // Update user_profiles table with the selected type
         const { error } = await supabase
           .from('user_profiles')
-          .update({ user_type: role })
+          .update({ 
+            user_type: role,
+            role: 'user' // Default role
+          })
           .eq('id', user.id);
 
         if (error) {
           console.error("Error updating profile:", error);
           alert("حدث خطأ أثناء حفظ البيانات. يرجى المحاولة مرة أخرى.");
-          setLoading(false);
           return;
         }
 
-        console.log('✅ User type updated to:', role);
-        
-        // Force reload to update AuthContext
+        // Wait a bit for propagation
         await new Promise(resolve => setTimeout(resolve, 500));
         
-        // Navigate based on role
-        if (role === 'teacher') {
-          window.location.href = createPageUrl("TeacherDashboard");
-        } else if (role === 'center') {
-          window.location.href = createPageUrl("CenterDashboard");
-        } else {
-          window.location.href = createPageUrl("StudentDashboard");
-        }
+        // Redirect based on role
+        const targetPage = role === 'teacher' ? "TeacherDashboard" :
+                          role === 'center' ? "CenterDashboard" : 
+                          "StudentDashboard";
+                          
+        window.location.href = createPageUrl(targetPage);
       }
     } catch (err) {
       console.error("Complete profile error:", err);
-      alert("حدث خطأ. يرجى المحاولة مرة أخرى.");
+      alert("حدث خطأ غير متوقع");
+    } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>إكمال الملف الشخصي</CardTitle>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4" dir="rtl">
+      <Card className="w-full max-w-md shadow-lg">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl font-bold text-gray-800">إكمال الملف الشخصي</CardTitle>
+          <p className="text-gray-500 text-sm">يرجى تحديد نوع حسابك للمتابعة</p>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <label>نوع الحساب</label>
-              <Select value={role} onValueChange={setRole} disabled={loading}>
-                <SelectTrigger>
+              <label className="text-sm font-medium text-gray-700">نوع الحساب</label>
+              <Select value={role} onValueChange={setRole}>
+                <SelectTrigger className="w-full text-right">
                   <SelectValue placeholder="اختر نوع الحساب" />
                 </SelectTrigger>
                 <SelectContent>
@@ -75,12 +76,13 @@ export default function CompleteProfile() {
                 </SelectContent>
               </Select>
             </div>
+            
             <Button 
               type="submit" 
-              className="w-full bg-green-600 hover:bg-green-700" 
+              className="w-full bg-green-600 hover:bg-green-700 text-white py-2" 
               disabled={!role || loading}
             >
-              {loading ? 'جاري الحفظ...' : 'حفظ ومتابعة'}
+              {loading ? "جاري الحفظ..." : "حفظ ومتابعة"}
             </Button>
           </form>
         </CardContent>

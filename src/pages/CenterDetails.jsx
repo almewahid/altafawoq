@@ -17,7 +17,7 @@ export default function CenterDetails() {
     queryFn: async () => {
       // Mock data if table doesn't exist or fetch real data
       return {
-        name: "مركز أستاذي التعليمي",
+        name: "مركز التفوق التعليمي",
         description: "مركز رائد في تقديم خدمات تعليمية متميزة لجميع المراحل",
         address: "مدينة الكويت، شارع الخليج",
         phone: "+965 1234 5678",

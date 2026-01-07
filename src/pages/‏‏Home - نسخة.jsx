@@ -9,8 +9,7 @@ import {
   Building2, 
   GraduationCap,
   ArrowLeft,
-  FileText,
-  UserPlus
+  FileText
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -45,10 +44,6 @@ export default function HomePage() {
     navigate(createPageUrl("UserLogin"));
   };
 
-  const handleGuestBrowse = () => {
-    navigate(createPageUrl("Browse") + "?guest=true");
-  };
-
   const teachingCategories = [
     {
       id: "online",
@@ -74,7 +69,7 @@ export default function HomePage() {
       description: "انضم لمراكز تعليمية متخصصة بمناهج متطورة",
       icon: Building2,
       gradient: "from-orange-500 to-red-600",
-      image: "https://res.cloudinary.com/dufjbywcm/image/upload/v1767365472/Educational_center_owuixr.png",
+      image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=400&h=300&fit=crop",
       features: ["بيئة تعليمية مميزة", "مجموعات صغيرة", "مرافق حديثة"]
     },
     {
@@ -83,16 +78,16 @@ export default function HomePage() {
       description: "أبحاث، بوربوينت، حل واجبات ومشاريع",
       icon: FileText,
       gradient: "from-purple-500 to-pink-600",
-      image: "https://res.cloudinary.com/dufjbywcm/image/upload/v1767365474/Educational_services_bfcd7m.png",
+      image: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=400&h=300&fit=crop",
       features: ["أبحاث علمية", "عروض تقديمية", "حل واجبات"]
     }
   ];
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-colors duration-300">
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
         {/* Header */}
-        <div className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border-b border-orange-200 dark:border-slate-700 rounded-b-3xl transition-colors duration-300">
+        <div className="bg-white/80 backdrop-blur-sm border-b border-orange-100">
           <div className="px-3 md:max-w-7xl md:mx-auto md:px-6 lg:px-8 py-2 md:py-6">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2 md:gap-3">
@@ -100,28 +95,18 @@ export default function HomePage() {
                   <GraduationCap className="w-5 h-5 md:w-7 md:h-7 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-lg md:text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-300">أستاذي</h1>
-                  <p className="text-gray-600 dark:text-gray-400 text-xs md:text-sm transition-colors duration-300">منصة تعليمية</p>
+                  <h1 className="text-lg md:text-2xl font-bold text-gray-900">أستاذي</h1>
+                  <p className="text-gray-600 text-xs md:text-sm">منصة تعليمية</p>
                 </div>
               </div>
               
               {!user && (
-                <div className="flex gap-2">
-                  <Button 
-                    onClick={handleGuestBrowse}
-                    variant="outline"
-                    className="hover:bg-black hover:text-white text-xs md:text-base px-3 py-1.5 md:px-4 md:py-2 transition-all"
-                  >
-                    <UserPlus className="w-4 h-4 ml-1" />
-                    زائر
-                  </Button>
-                  <Button 
-                    onClick={handleLogin}
-                    className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold text-xs md:text-base px-3 py-1.5 md:px-4 md:py-2 transition-all shadow-lg"
-                  >
-                    تسجيل الدخول
-                  </Button>
-                </div>
+                <Button 
+                  onClick={handleLogin}
+                  className="bg-green-600 hover:bg-green-700 text-xs md:text-base px-3 py-1.5 md:px-4 md:py-2"
+                >
+                  تسجيل الدخول
+                </Button>
               )}
             </div>
           </div>
@@ -130,10 +115,10 @@ export default function HomePage() {
         {/* Main Content */}
         <div className="px-3 md:max-w-7xl md:mx-auto md:px-6 lg:px-8 py-3 md:py-12 pb-20 md:pb-12">
           <div className="text-center mb-3 md:mb-12">
-            <h2 className="text-xl md:text-4xl font-bold text-gray-900 dark:text-white mb-1 md:mb-4 transition-colors duration-300">
+            <h2 className="text-xl md:text-4xl font-bold text-gray-900 mb-1 md:mb-4">
               اختر الخدمة المناسبة لك
             </h2>
-            <p className="text-sm md:text-lg text-gray-700 dark:text-gray-300 md:max-w-2xl md:mx-auto transition-colors duration-300">
+            <p className="text-sm md:text-lg text-gray-600 md:max-w-2xl md:mx-auto">
               نوفر لك أربع خدمات مميزة، اختر ما يناسب احتياجاتك وظروفك
             </p>
           </div>
@@ -142,7 +127,7 @@ export default function HomePage() {
             {teachingCategories.map((category) => (
               <Card 
                 key={category.id}
-                className="group relative overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-2 bg-white dark:bg-slate-800/95 backdrop-blur-sm rounded-3xl"
+                className="group relative overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-2"
                 onClick={() => {
                   if (category.id === 'services') {
                     navigate(createPageUrl("EducationalServices"));
@@ -151,40 +136,42 @@ export default function HomePage() {
                   }
                 }}
               >
-                <div className="relative h-32 md:h-56 overflow-hidden rounded-t-3xl">
-                  <img 
-                    src={category.image} 
-                    alt={category.title}
-                    className="w-full h-full object-contain bg-white p-2 group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                
-                <CardContent className="relative p-2.5 md:p-6">
-                  <h3 className="text-xs md:text-xl font-bold text-gray-900 dark:text-white mb-1 md:mb-3 text-center transition-colors duration-300">
-                    {category.title}
-                  </h3>
-                  
-                  <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mb-2 md:mb-4 text-center hidden md:block transition-colors duration-300">
-                    {category.description}
-                  </p>
-
-                  <div className="space-y-1 mb-2 md:mb-6 hidden md:block">
-                    {category.features.map((feature, idx) => (
-                      <div key={idx} className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 transition-colors duration-300"></div>
-                        <span className="text-xs md:text-sm text-gray-600 dark:text-gray-400 transition-colors duration-300">
-                          {feature}
-                        </span>
-                      </div>
-                    ))}
+                <CardContent className="p-0">
+                  <div className="relative h-28 md:h-48 overflow-hidden">
+                    <img 
+                      src={category.image} 
+                      alt={category.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
                   </div>
+                  
+                  <div className="relative p-2.5 md:p-6">
+                    <h3 className="text-xs md:text-xl font-bold text-gray-900 mb-1 md:mb-3 text-center">
+                      {category.title}
+                    </h3>
+                    
+                    <p className="text-xs md:text-sm text-gray-600 mb-2 md:mb-4 text-center hidden md:block">
+                      {category.description}
+                    </p>
 
-                  <Button 
-                    className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold text-xs md:text-sm py-1.5 md:py-2 transition-all shadow-lg"
-                  >
-                    <span>طلب خدمة</span>
-                    <ArrowLeft className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2 group-hover:translate-x-1 transition-transform" />
-                  </Button>
+                    <div className="space-y-1 mb-2 md:mb-6 hidden md:block">
+                      {category.features.map((feature, idx) => (
+                        <div key={idx} className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-gray-400"></div>
+                          <span className="text-xs md:text-sm text-gray-600">
+                            {feature}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <Button 
+                      className={`w-full bg-gradient-to-r ${category.gradient} hover:opacity-90 text-white text-xs md:text-sm py-1.5 md:py-2`}
+                    >
+                      <span>تصفح</span>
+                      <ArrowLeft className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2 group-hover:translate-x-1 transition-transform" />
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             ))}
