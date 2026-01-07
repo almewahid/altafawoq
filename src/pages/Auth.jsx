@@ -50,7 +50,7 @@ export default function Auth() {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: 'https://ostazy.vercel.app/auth',
+          redirectTo: 'https://www.ostazy.net/auth',
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
