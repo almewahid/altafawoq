@@ -178,68 +178,16 @@ export default function Browse() {
             </div>
 
             {showFilters && (
-              <div className="grid md:grid-cols-4 gap-4 mt-4 pt-4 border-t dark:border-slate-600">
-                <div className="grid md:grid-cols-5 gap-4 mt-4 pt-4 border-t dark:border-slate-600">
-  <Select value={filters.entity_type} onValueChange={(v) => setFilters({...filters, entity_type: v})}>
-    <SelectTrigger className="dark:bg-slate-700 dark:text-white dark:border-slate-600">
-      <SelectValue placeholder="النوع" />
-    </SelectTrigger>
-    <SelectContent>
-      <SelectItem value="all">الكل</SelectItem>
-      <SelectItem value="group">مجموعة دراسية</SelectItem>
-      <SelectItem value="teacher">معلم</SelectItem>
-      <SelectItem value="center">مركز تعليمي</SelectItem>
-    </SelectContent>
-  </Select>
-
-  <Select value={filters.subject} onValueChange={(v) => setFilters({...filters, subject: v})}>
-    <SelectTrigger className="dark:bg-slate-700 dark:text-white dark:border-slate-600">
-      <SelectValue placeholder="المادة" />
-    </SelectTrigger>
-    <SelectContent>
-      <SelectItem value="all">كل المواد</SelectItem>
-      {allSubjects.map((subject) => (
-        <SelectItem key={subject} value={subject}>{subject}</SelectItem>
-      ))}
-    </SelectContent>
-  </Select>
-
-  <Select value={filters.stage} onValueChange={(v) => setFilters({...filters, stage: v})}>
-    <SelectTrigger className="dark:bg-slate-700 dark:text-white dark:border-slate-600">
-      <SelectValue placeholder="المرحلة" />
-    </SelectTrigger>
-    <SelectContent>
-      <SelectItem value="all">كل المراحل</SelectItem>
-      {allStages.map((stage) => (
-        <SelectItem key={stage} value={stage}>{stage}</SelectItem>
-      ))}
-    </SelectContent>
-  </Select>
-
-  <Select value={filters.curriculum} onValueChange={(v) => setFilters({...filters, curriculum: v})}>
-    <SelectTrigger className="dark:bg-slate-700 dark:text-white dark:border-slate-600">
-      <SelectValue placeholder="المنهج" />
-    </SelectTrigger>
-    <SelectContent>
-      <SelectItem value="all">كل المناهج</SelectItem>
-      {allCurricula.map((curriculum) => (
-        <SelectItem key={curriculum} value={curriculum}>{curriculum}</SelectItem>
-      ))}
-    </SelectContent>
-  </Select>
-
-  <Select value={filters.teaching_type} onValueChange={(v) => setFilters({...filters, teaching_type: v})}>
-    <SelectTrigger className="dark:bg-slate-700 dark:text-white dark:border-slate-600">
-      <SelectValue placeholder="نوع التدريس" />
-    </SelectTrigger>
-    <SelectContent>
-      <SelectItem value="all">الكل</SelectItem>
-      <SelectItem value="online">أونلاين</SelectItem>
-      <SelectItem value="home">حضوري</SelectItem>
-    </SelectContent>
-  </Select>
-</div>
-                  
+              <div className="grid md:grid-cols-5 gap-4 mt-4 pt-4 border-t dark:border-slate-600">
+                <Select value={filters.entity_type} onValueChange={(v) => setFilters({...filters, entity_type: v})}>
+                  <SelectTrigger className="dark:bg-slate-700 dark:text-white dark:border-slate-600">
+                    <SelectValue>
+                      {filters.entity_type === "all" && "الكل"}
+                      {filters.entity_type === "group" && "مجموعة دراسية"}
+                      {filters.entity_type === "teacher" && "معلم"}
+                      {filters.entity_type === "center" && "مركز تعليمي"}
+                    </SelectValue>
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">الكل</SelectItem>
                     <SelectItem value="group">مجموعة دراسية</SelectItem>
@@ -250,7 +198,9 @@ export default function Browse() {
 
                 <Select value={filters.subject} onValueChange={(v) => setFilters({...filters, subject: v})}>
                   <SelectTrigger className="dark:bg-slate-700 dark:text-white dark:border-slate-600">
-                    <SelectValue placeholder="المادة" />
+                    <SelectValue>
+                      {filters.subject === "all" ? "كل المواد" : filters.subject}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">كل المواد</SelectItem>
@@ -262,7 +212,9 @@ export default function Browse() {
 
                 <Select value={filters.stage} onValueChange={(v) => setFilters({...filters, stage: v})}>
                   <SelectTrigger className="dark:bg-slate-700 dark:text-white dark:border-slate-600">
-                    <SelectValue placeholder="المرحلة" />
+                    <SelectValue>
+                      {filters.stage === "all" ? "كل المراحل" : filters.stage}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">كل المراحل</SelectItem>
@@ -274,7 +226,9 @@ export default function Browse() {
 
                 <Select value={filters.curriculum} onValueChange={(v) => setFilters({...filters, curriculum: v})}>
                   <SelectTrigger className="dark:bg-slate-700 dark:text-white dark:border-slate-600">
-                    <SelectValue placeholder="المنهج" />
+                    <SelectValue>
+                      {filters.curriculum === "all" ? "كل المناهج" : filters.curriculum}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">كل المناهج</SelectItem>
@@ -286,7 +240,11 @@ export default function Browse() {
 
                 <Select value={filters.teaching_type} onValueChange={(v) => setFilters({...filters, teaching_type: v})}>
                   <SelectTrigger className="dark:bg-slate-700 dark:text-white dark:border-slate-600">
-                    <SelectValue placeholder="نوع التدريس" />
+                    <SelectValue>
+                      {filters.teaching_type === "all" && "الكل"}
+                      {filters.teaching_type === "online" && "أونلاين"}
+                      {filters.teaching_type === "home" && "حضوري"}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">الكل</SelectItem>
