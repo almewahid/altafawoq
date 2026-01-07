@@ -37,7 +37,7 @@ export default function HomePage() {
   }, [userData]);
 
   React.useEffect(() => {
-    document.title = "التفوق - منصة تعليمية";
+    document.title = "أستاذي - منصة تعليمية";
   }, []);
 
   const handleLogin = () => {
@@ -95,7 +95,7 @@ export default function HomePage() {
                   <GraduationCap className="w-5 h-5 md:w-7 md:h-7 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-lg md:text-2xl font-bold text-gray-900">التفوق</h1>
+                  <h1 className="text-lg md:text-2xl font-bold text-gray-900">أستاذي</h1>
                   <p className="text-gray-600 text-xs md:text-sm">منصة تعليمية</p>
                 </div>
               </div>

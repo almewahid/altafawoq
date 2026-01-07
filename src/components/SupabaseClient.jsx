@@ -9,7 +9,7 @@ const getHeaders = (token = null) => {
     'apikey': supabaseKey,
     'Content-Type': 'application/json',
     'Prefer': 'return=representation',
-    'x-application-name': 'altafawoq'
+    'x-application-name': 'ostazy'
   };
   
   if (!token) {

@@ -11,7 +11,7 @@ export default function StudentAssignments() {
     queryFn: async () => {
       // Mock data
       return [
-        { id: 1, title: "واجب الرياضيات #3", status: "pending", dueDate: "2024-12-10", group: "مجموعة التفوق" },
+        { id: 1, title: "واجب الرياضيات #3", status: "pending", dueDate: "2024-12-10", group: "مجموعة أستاذي" },
         { id: 2, title: "تقرير الفيزياء", status: "submitted", dueDate: "2024-12-05", group: "الفيزياء الحديثة" },
       ];
     }

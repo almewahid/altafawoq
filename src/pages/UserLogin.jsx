@@ -77,7 +77,7 @@ export default function UserLogin() {
             {isSignUp ? "إنشاء حساب جديد" : "تسجيل الدخول"}
           </CardTitle>
           <p className="text-gray-500 text-sm">
-            منصة التفوق التعليمية (Supabase)
+            منصة أستاذي التعليمية (Supabase)
           </p>
         </CardHeader>
         <CardContent>

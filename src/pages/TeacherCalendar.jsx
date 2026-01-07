@@ -14,7 +14,7 @@ export default function TeacherCalendar() {
       if (!user) return [];
       // Mock data
       return [
-        { id: 1, title: "مراجعة رياضيات", date: new Date(), time: "10:00", group: "مجموعة التفوق" },
+        { id: 1, title: "مراجعة رياضيات", date: new Date(), time: "10:00", group: "مجموعة أستاذي" },
         { id: 2, title: "فيزياء متقدمة", date: new Date(Date.now() + 86400000), time: "14:30", group: "الصف الثاني عشر" },
       ];
     }

@@ -229,7 +229,7 @@ export default function Layout({ children, currentPageName }) {
                     <GraduationCap className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h2 className="font-bold text-gray-900 text-lg">التفوق</h2>
+                    <h2 className="font-bold text-gray-900 text-lg">أستاذي</h2>
                     <p className="text-xs text-gray-500">منصة تعليمية</p>
                   </div>
                 </div>

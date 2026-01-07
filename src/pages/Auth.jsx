@@ -50,7 +50,7 @@ export default function Auth() {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: 'https://altafawoq.vercel.app/auth',
+          redirectTo: 'https://ostazy.vercel.app/auth',
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
@@ -159,7 +159,7 @@ export default function Auth() {
             {isLogin ? 'مرحباً بعودتك!' : 'إنشاء حساب جديد'}
           </h1>
           <p className="text-gray-600">
-            {isLogin ? 'سجل دخولك للمتابعة' : 'انضم إلى منصة التفوق'}
+            {isLogin ? 'سجل دخولك للمتابعة' : 'انضم إلى منصة أستاذي'}
           </p>
         </div>
 
