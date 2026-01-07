@@ -6,9 +6,17 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Filter, ArrowRight, MapPin, Video, Home as HomeIcon, MessageCircle } from "lucide-react";
+import { Search, Filter, ArrowRight, MapPin, Video, Home as HomeIcon, MessageCircle, RotateCcw } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+
+const DEFAULT_FILTERS = {
+  entity_type: "all",
+  subject: "all",
+  stage: "all",
+  curriculum: "all",
+  teaching_type: "all",
+};
 
 export default function Browse() {
   const navigate = useNavigate();
@@ -16,15 +24,13 @@ export default function Browse() {
   const isGuest = searchParams.get('guest') === 'true';
   
   const [search, setSearch] = useState("");
-  const [filters, setFilters] = useState({
-    subject: "all",
-    stage: "all",
-    curriculum: "all",
-    teaching_type: "all",
-    country: "all",
-    entity_type: "all"
-  });
+  const [filters, setFilters] = useState(DEFAULT_FILTERS);
   const [showFilters, setShowFilters] = useState(false);
+
+  const resetFilters = () => {
+    setFilters(DEFAULT_FILTERS);
+    setSearch("");
+  };
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
@@ -178,7 +184,7 @@ export default function Browse() {
             </div>
 
             {showFilters && (
-              <div className="grid md:grid-cols-5 gap-4 mt-4 pt-4 border-t dark:border-slate-600">
+              <div className="grid md:grid-cols-6 gap-4 mt-4 pt-4 border-t dark:border-slate-600">
                 <Select value={filters.entity_type} onValueChange={(v) => setFilters({...filters, entity_type: v})}>
                   <SelectTrigger className="dark:bg-slate-700 dark:text-white dark:border-slate-600">
                     <SelectValue>
@@ -252,6 +258,15 @@ export default function Browse() {
                     <SelectItem value="home">حضوري</SelectItem>
                   </SelectContent>
                 </Select>
+
+                <Button
+                  variant="outline"
+                  onClick={resetFilters}
+                  className="flex gap-2 hover:bg-red-50 dark:hover:bg-red-900/20 dark:bg-slate-700 dark:text-white dark:border-slate-600 transition-all"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  إعادة التعيين
+                </Button>
               </div>
             )}
           </CardContent>
