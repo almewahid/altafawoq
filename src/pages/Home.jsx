@@ -51,7 +51,7 @@ export default function HomePage() {
       description: "تعلم من منزلك مع أفضل المعلمين عبر الإنترنت",
       icon: Video,
       gradient: "from-blue-500 to-cyan-600",
-      image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=300&fit=crop",
+      image: "https://res.cloudinary.com/dufjbywcm/image/upload/v1767365478/Online_teacher_azc5ye.png",
       features: ["دروس تفاعلية", "مرونة في المواعيد", "توفير الوقت والجهد"]
     },
     {
@@ -60,7 +60,7 @@ export default function HomePage() {
       description: "معلم خاص يأتي إلى منزلك لتعليم شخصي مباشر",
       icon: Home,
       gradient: "from-green-500 to-emerald-600",
-      image: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400&h=300&fit=crop",
+      image: "https://res.cloudinary.com/dufjbywcm/image/upload/v1767365477/Home_teacher_pb3x42.png",
       features: ["تعليم وجهاً لوجه", "اهتمام شخصي", "جدول مخصص"]
     },
     {
@@ -80,7 +80,7 @@ export default function HomePage() {
       gradient: "from-purple-500 to-pink-600",
       image: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=400&h=300&fit=crop",
       features: ["أبحاث علمية", "عروض تقديمية", "حل واجبات"]
-    }
+
   ];
 
   return (
@@ -142,10 +142,7 @@ export default function HomePage() {
                     alt={category.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                   />
-                  <div className={`absolute inset-0 bg-gradient-to-br ${category.gradient} opacity-80 group-hover:opacity-90 transition-opacity duration-500`}></div>
                   
-                  <div className={`absolute inset-0 flex items-center justify-center`}>
-                    <category.icon className="w-10 h-10 md:w-16 md:h-16 text-white" />
                   </div>
                 </div>
                 
