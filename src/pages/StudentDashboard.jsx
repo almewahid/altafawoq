@@ -36,15 +36,15 @@ import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Toolti
 const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6'];
 
 const dashboardImages = {
-  activeGroups: "https://res.cloudinary.com/dufjbywcm/image/upload/v1767365471/Active_groups_afvv45.png",
-  pendingAssignments: "https://res.cloudinary.com/dufjbywcm/image/upload/v1767365484/Solve_assignments_r9uncg.png",
-  progressRate: "https://res.cloudinary.com/dufjbywcm/image/upload/v1767365481/Progress_rate_gpsviq.png",
-  sessions: "https://res.cloudinary.com/dufjbywcm/image/upload/v1767365483/Sessions_wlbx2f.png",
-  findTeacher: "https://res.cloudinary.com/dufjbywcm/image/upload/v1767365475/Find_teacher_mfychb.png",
-  assignments: "https://res.cloudinary.com/dufjbywcm/image/upload/v1767365484/Solve_assignments_r9uncg.png",
-  chat: "https://res.cloudinary.com/dufjbywcm/image/upload/v1767365471/Chat_jhzx7q.png",
-  personalGoals: "https://res.cloudinary.com/dufjbywcm/image/upload/v1767365479/personal_goals_komreh.png",
-  objectives: "https://res.cloudinary.com/dufjbywcm/image/upload/v1767365474/Educational_objectives_zjcjog.png"
+  activeGroups: "https://res.cloudinary.com/dufjbywcm/image/upload/q_auto,f_auto,fl_lossy,w_300/v1767365471/Active_groups_afvv45.png",
+  pendingAssignments: "https://res.cloudinary.com/dufjbywcm/image/upload/q_auto,f_auto,fl_lossy,w_400/v1769070975/Pending_assignments_zdtxuu.png",
+  progressRate: "https://res.cloudinary.com/dufjbywcm/image/upload/q_auto,f_auto,fl_lossy,w_150/v1767365481/Progress_rate_gpsviq.png",
+  sessions: "https://res.cloudinary.com/dufjbywcm/image/upload/q_auto,f_auto,fl_lossy,w_150/v1767365483/Sessions_wlbx2f.png",
+  findTeacher: "https://res.cloudinary.com/dufjbywcm/image/upload/q_auto,f_auto,fl_lossy,w_150/v1767365475/Find_teacher_mfychb.png",
+  assignments: "https://res.cloudinary.com/dufjbywcm/image/upload/q_auto,f_auto,fl_lossy,w_150/v1767365484/Solve_assignments_r9uncg.png",
+  chat: "https://res.cloudinary.com/dufjbywcm/image/upload/q_auto,f_auto,fl_lossy,w_150/v1767365471/Chat_jhzx7q.png",
+  personalGoals: "https://res.cloudinary.com/dufjbywcm/image/upload/q_auto,f_auto,fl_lossy,w_150/v1767365479/personal_goals_komreh.png",
+  objectives: "https://res.cloudinary.com/dufjbywcm/image/upload/q_auto,f_auto,fl_lossy,w_150/v1767365474/Educational_objectives_zjcjog.png"
 };
 
 export default function StudentDashboard() {
@@ -330,11 +330,11 @@ export default function StudentDashboard() {
             const Icon = stat.icon;
             return (
               <Card key={index} className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all rounded-3xl overflow-hidden">
-                <div className="relative h-24 md:h-32 overflow-hidden">
+                <div className="relative w-full aspect-square overflow-hidden">
                   <img 
                     src={stat.image} 
                     alt={stat.title}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-contain bg-white p-2"
                   />
                 </div>
                 <CardContent className="p-3 md:p-6">
@@ -455,11 +455,11 @@ export default function StudentDashboard() {
               className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all cursor-pointer group rounded-3xl overflow-hidden"
               onClick={() => navigate(createPageUrl(action.url))}
             >
-              <div className="relative h-20 md:h-32 overflow-hidden">
+              <div className="relative w-full aspect-square overflow-hidden">
                 <img 
                   src={action.img} 
                   alt={action.title}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  className="w-full h-full object-contain bg-white p-2 group-hover:scale-110 transition-transform duration-500"
                 />
               </div>
               <CardContent className="p-3 md:p-6 text-center">

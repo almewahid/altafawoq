@@ -8,6 +8,19 @@ import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
+const teacherImages = {
+  dashboard: "https://res.cloudinary.com/dufjbywcm/image/upload/q_auto,f_auto,fl_lossy,w_150/v1769071653/Teacher_Control_Panel_ziohs0.png",
+  students: "https://res.cloudinary.com/dufjbywcm/image/upload/q_auto,f_auto,fl_lossy,w_150/v1769071649/Active_students_fpw55h.png",
+  groups: "https://res.cloudinary.com/dufjbywcm/image/upload/q_auto,f_auto,fl_lossy,w_150/v1769071652/Groups_wrpj91.png",
+  wallet: "https://res.cloudinary.com/dufjbywcm/image/upload/q_auto,f_auto,fl_lossy,w_150/v1769071648/Wallet_loa5t7.png",
+  schedule: "https://res.cloudinary.com/dufjbywcm/image/upload/q_auto,f_auto,fl_lossy,w_150/v1769071649/Class_schedule_njgnrk.png",
+  chat: "https://res.cloudinary.com/dufjbywcm/image/upload/q_auto,f_auto,fl_lossy,w_150/v1769071649/Chatt_idgdog.png",
+  coupon: "https://res.cloudinary.com/dufjbywcm/image/upload/q_auto,f_auto,fl_lossy,w_150/v1769071651/coupon_g0812k.png",
+  myGroups: "https://res.cloudinary.com/dufjbywcm/image/upload/q_auto,f_auto,fl_lossy,w_150/v1769071651/My_groups_kewuov.png",
+  nextClasses: "https://res.cloudinary.com/dufjbywcm/image/upload/q_auto,f_auto,fl_lossy,w_150/v1769071650/Next_classes_f5fqvn.png",
+  monthlyProfits: "https://res.cloudinary.com/dufjbywcm/image/upload/q_auto,f_auto,fl_lossy,w_150/v1769071648/Monthly_profits_zulefg.png"
+};
+
 export default function TeacherDashboard() {
   const navigate = useNavigate();
   

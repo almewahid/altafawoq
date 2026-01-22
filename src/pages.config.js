@@ -2,6 +2,7 @@ import Home from './pages/Home';
 import Browse from './pages/Browse';
 import TeacherDashboard from './pages/TeacherDashboard';
 import TeacherGroups from './pages/TeacherGroups';
+import TeacherStudents from './pages/TeacherStudents';
 import TeacherCoupons from './pages/TeacherCoupons';
 import Messages from './pages/Messages';
 import TeacherDetails from './pages/TeacherDetails';
@@ -30,6 +31,7 @@ export const PAGES = {
     privacypolicy: { component: PrivacyPolicy, protected: false },
     teacherdashboard: { component: TeacherDashboard, protected: true },
     teachergroups: { component: TeacherGroups, protected: true },
+    teacherstudents: { component: TeacherStudents, protected: true },
     teachercoupons: { component: TeacherCoupons, protected: true },
     messages: { component: Messages, protected: true },
     teacherdetails: { component: TeacherDetails, protected: true },
