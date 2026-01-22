@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { base44 } from "@/api/base44Client";
+import { supabase } from "@/components/SupabaseClient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Send, Paperclip, Users, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,49 +16,80 @@ export default function ChatInterface({ receiverEmail, groupId, onClose }) {
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me(),
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+      
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('email', user.email)
+        .single();
+      
+      return { ...user, ...profile };
+    },
   });
 
   const { data: messages = [], isLoading } = useQuery({
     queryKey: ['chatMessages', receiverEmail, groupId],
     queryFn: async () => {
       if (groupId) {
-        return await base44.entities.ChatMessage.filter({ group_id: groupId }, '-created_date', 100);
+        const { data } = await supabase
+          .from('chat_messages')
+          .select('*')
+          .eq('group_id', groupId)
+          .order('created_at', { ascending: true })
+          .limit(100);
+        return data || [];
       } else if (receiverEmail) {
-        const sent = await base44.entities.ChatMessage.filter({ 
-          sender_email: user?.email, 
-          receiver_email: receiverEmail 
-        });
-        const received = await base44.entities.ChatMessage.filter({ 
-          sender_email: receiverEmail,
-          receiver_email: user?.email 
-        });
-        return [...sent, ...received].sort((a, b) => 
-          new Date(a.created_date) - new Date(b.created_date)
+        const { data: sent } = await supabase
+          .from('chat_messages')
+          .select('*')
+          .eq('sender_email', user?.email)
+          .eq('receiver_email', receiverEmail)
+          .is('group_id', null);
+        
+        const { data: received } = await supabase
+          .from('chat_messages')
+          .select('*')
+          .eq('sender_email', receiverEmail)
+          .eq('receiver_email', user?.email)
+          .is('group_id', null);
+        
+        return [...(sent || []), ...(received || [])].sort((a, b) => 
+          new Date(a.created_at) - new Date(b.created_at)
         );
       }
       return [];
     },
     enabled: !!user?.email && (!!receiverEmail || !!groupId),
-    refetchInterval: 5000, // Refetch every 5 seconds for real-time effect
+    refetchInterval: 5000,
   });
 
   const sendMessageMutation = useMutation({
-    mutationFn: (data) => base44.entities.ChatMessage.create(data),
-    onSuccess: () => {
+    mutationFn: async (data) => {
+      const { data: message, error } = await supabase
+        .from('chat_messages')
+        .insert([data])
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return message;
+    },
+    onSuccess: async () => {
       queryClient.invalidateQueries(['chatMessages']);
       setMessageText("");
       
-      // Create notification for receiver
       if (receiverEmail) {
-        base44.entities.Notification.create({
+        await supabase.from('notifications').insert([{
           user_email: receiverEmail,
           title: "رسالة جديدة",
           message: `رسالة جديدة من ${user?.full_name}`,
           type: "message",
           link: "",
           is_read: false
-        });
+        }]);
       }
     },
   });
@@ -68,20 +99,37 @@ export default function ChatInterface({ receiverEmail, groupId, onClose }) {
     if (!file) return;
 
     setUploadingFile(true);
-    const result = await base44.integrations.Core.UploadFile({ file });
     
-    sendMessageMutation.mutate({
-      sender_email: user?.email,
-      receiver_email: receiverEmail,
-      group_id: groupId,
-      message: `تم إرسال ملف: ${file.name}`,
-      message_type: "file",
-      file_url: result.file_url,
-      file_name: file.name,
-      is_read: false
-    });
-    
-    setUploadingFile(false);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `chat-files/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('uploads')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('uploads')
+        .getPublicUrl(filePath);
+
+      sendMessageMutation.mutate({
+        sender_email: user?.email,
+        receiver_email: receiverEmail,
+        group_id: groupId,
+        message: `تم إرسال ملف: ${file.name}`,
+        message_type: "file",
+        file_url: publicUrl,
+        file_name: file.name,
+        is_read: false
+      });
+    } catch (error) {
+      console.error('خطأ في رفع الملف:', error);
+    } finally {
+      setUploadingFile(false);
+    }
   };
 
   const handleSendMessage = () => {
@@ -176,7 +224,7 @@ export default function ChatInterface({ receiverEmail, groupId, onClose }) {
                       )}
                     </div>
                     <p className={`text-xs mt-1 ${isSent ? 'text-left' : 'text-right'} text-gray-500`}>
-                      {format(new Date(msg.created_date), 'HH:mm', { locale: ar })}
+                      {format(new Date(msg.created_at), 'HH:mm', { locale: ar })}
                     </p>
                   </div>
                 </div>
