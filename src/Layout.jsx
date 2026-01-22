@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
+import { supabase } from "@/components/SupabaseClient";
 import { 
   Home, 
   Users, 
@@ -13,8 +14,11 @@ import {
   GraduationCap,
   Calendar,
   Wallet,
-  FileText
-} from "lucide-react";
+  Clock,
+  Target,
+  Moon,
+  Sun
+  } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -27,26 +31,47 @@ import {
   SidebarHeader,
   SidebarFooter,
   SidebarProvider,
+  SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
 import NotificationBadge from "@/components/NotificationBadge";
 import MobileBottomNav from "@/components/MobileBottomNav";
-import { supabase } from "@/components/SupabaseClient";
-import { useAuth } from "@/context/AuthContext";
 
 export default function Layout({ children, currentPageName }) {
   const location = useLocation();
   const navigate = useNavigate();
-  const { currentUser, userType } = useAuth();
+  const [user, setUser] = React.useState(null);
+  const [darkMode, setDarkMode] = React.useState(() => {
+    const saved = localStorage.getItem('darkMode');
+    return saved ? JSON.parse(saved) : false;
+  });
+
+  React.useEffect(() => {
+    localStorage.setItem('darkMode', JSON.stringify(darkMode));
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
+
+  const { data: userData } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: () => supabase.auth.getCurrentUserWithProfile(),
+    retry: false,
+  });
+
+  React.useEffect(() => {
+    if (userData) {
+      setUser(userData);
+    }
+  }, [userData]);
 
   const handleLogout = async () => {
-  try {
     await supabase.auth.signOut();
-    navigate("/login");
-  } catch (err) {
-    console.error("فشل تسجيل الخروج:", err);
-  }
-};
+    window.location.href = createPageUrl("Home");
+  };
 
   const getNavigationItems = () => {
     const baseItems = [
@@ -57,156 +82,131 @@ export default function Layout({ children, currentPageName }) {
       }
     ];
 
-    // قائمة المعلم
-    const teacherItems = [
-      {
-        title: "لوحة التحكم",
-        url: createPageUrl("TeacherDashboard"),
-        icon: LayoutDashboard,
-      },
-      {
-        title: "المجموعات",
-        url: createPageUrl("TeacherGroups"),
-        icon: Users,
-      },
-      // ❌ الدروس - مخفي مؤقتاً (الصفحة غير موجودة)
-      // {
-      //   title: "الدروس",
-      //   url: createPageUrl("TeacherLessons"),
-      //   icon: BookOpen,
-      // },
-      // ❌ الواجبات - مخفي مؤقتاً (الصفحة غير موجودة)
-      // {
-      //   title: "الواجبات",
-      //   url: createPageUrl("TeacherAssignments"),
-      //   icon: FileText,
-      // },
-      {
-        title: "الجدول",
-        url: createPageUrl("TeacherCalendar"),
-        icon: Calendar,
-      },
-      {
-        title: "المحفظة",
-        url: createPageUrl("TeacherWallet"),
-        icon: Wallet,
-      },
-      {
-        title: "الكوبونات",
-        url: createPageUrl("TeacherCoupons"),
-        icon: Tag,
-      },
-      {
-        title: "الدردشة",
-        url: createPageUrl("Chat"),
-        icon: MessageSquare,
-        badge: true,
-      },
-      // ❌ الإعدادات - مخفي مؤقتاً (الصفحة غير موجودة)
-      // {
-      //   title: "الإعدادات",
-      //   url: createPageUrl("Settings"),
-      //   icon: Settings,
-      // },
-    ];
+    if (user?.user_type === "teacher") {
+      return [
+        ...baseItems,
+        {
+          title: "لوحة التحكم",
+          url: createPageUrl("TeacherDashboard"),
+          icon: LayoutDashboard,
+        },
+        {
+          title: "المجموعات",
+          url: createPageUrl("TeacherGroups"),
+          icon: Users,
+        },
+        {
+          title: "طلابي",
+          url: createPageUrl("TeacherStudents"),
+          icon: GraduationCap,
+        },
+        {
+          title: "المحفظة",
+          url: createPageUrl("TeacherWallet"),
+          icon: Wallet,
+        },
+        {
+          title: "تتبع الحصص",
+          url: createPageUrl("SessionTracking"),
+          icon: Clock,
+        },
+        {
+          title: "الجدول",
+          url: createPageUrl("TeacherCalendar"),
+          icon: Calendar,
+        },
+        {
+          title: "الكوبونات",
+          url: createPageUrl("TeacherCoupons"),
+          icon: Tag,
+        },
+        {
+          title: "الدردشة",
+          url: createPageUrl("Chat"),
+          icon: MessageSquare,
+          badge: true,
+        },
+      ];
+    } else if (user?.user_type === "center") {
+      return [
+        ...baseItems,
+        {
+          title: "لوحة التحكم",
+          url: createPageUrl("CenterDashboard"),
+          icon: LayoutDashboard,
+        },
+        {
+          title: "الدردشة",
+          url: createPageUrl("Chat"),
+          icon: MessageSquare,
+          badge: true,
+        },
+      ];
+    } else if (user?.user_type === "student") {
+      return [
+        ...baseItems,
+        {
+          title: "لوحتي",
+          url: createPageUrl("StudentDashboard"),
+          icon: LayoutDashboard,
+        },
+        {
+          title: "الواجبات",
+          url: createPageUrl("StudentAssignments"),
+          icon: BookOpen,
+        },
+        {
+          title: "الجدول",
+          url: createPageUrl("StudentCalendar"),
+          icon: Calendar,
+        },
+        {
+          title: "الدردشة",
+          url: createPageUrl("Chat"),
+          icon: MessageSquare,
+          badge: true,
+        },
+        {
+          title: "أهدافي",
+          url: createPageUrl("StudentGoals"),
+          icon: Target,
+        },
+        {
+          title: "الإعدادات",
+          url: createPageUrl("StudentSettings"),
+          icon: Settings,
+        },
+      ];
+    } else if (user?.system_role === "admin") {
+      return [
+        ...baseItems,
+        {
+          title: "لوحة الإدارة",
+          url: createPageUrl("AdminDashboard"),
+          icon: Settings,
+        },
+        {
+          title: "لوحة المشرف",
+          url: createPageUrl("ModeratorDashboard"),
+          icon: LayoutDashboard,
+        },
+      ];
+    } else if (user?.system_role === "moderator") {
+      return [
+        ...baseItems,
+        {
+          title: "لوحة المشرف",
+          url: createPageUrl("ModeratorDashboard"),
+          icon: LayoutDashboard,
+        },
+      ];
+    }
 
-    // قائمة الطالب
-    const studentItems = [
-      {
-        title: "لوحتي",
-        url: createPageUrl("StudentDashboard"),
-        icon: LayoutDashboard,
-      },
-      // ❌ الدروس - مخفي مؤقتاً (الصفحة غير موجودة)
-      // {
-      //   title: "الدروس",
-      //   url: createPageUrl("StudentLessons"),
-      //   icon: BookOpen,
-      // },
-      {
-        title: "الواجبات",
-        url: createPageUrl("StudentAssignments"),
-        icon: FileText,
-      },
-      {
-        title: "الجدول",
-        url: createPageUrl("StudentCalendar"),
-        icon: Calendar,
-      },
-      {
-        title: "الدردشة",
-        url: createPageUrl("Chat"),
-        icon: MessageSquare,
-        badge: true,
-      },
-      // ❌ الإعدادات - مخفي مؤقتاً (الصفحة غير موجودة)
-      // {
-      //   title: "الإعدادات",
-      //   url: createPageUrl("Settings"),
-      //   icon: Settings,
-      // },
-    ];
-
-    // قائمة مركز تعليمي
-    const centerItems = [
-      {
-        title: "لوحة التحكم",
-        url: createPageUrl("CenterDashboard"),
-        icon: LayoutDashboard,
-      },
-      {
-        title: "المعلمين",
-        url: createPageUrl("CenterTeachers"),
-        icon: Users,
-      },
-      {
-        title: "الدردشة",
-        url: createPageUrl("Chat"),
-        icon: MessageSquare,
-        badge: true,
-      },
-    ];
-
-    // قائمة الإدارة
-    const adminItems = [
-      {
-        title: "لوحة الإدارة",
-        url: createPageUrl("AdminDashboard"),
-        icon: Settings,
-      },
-      {
-        title: "المستخدمين",
-        url: createPageUrl("AdminUsers"),
-        icon: Users,
-      },
-      {
-        title: "التقارير",
-        url: createPageUrl("AdminReports"),
-        icon: FileText,
-      },
-    ];
-
-    let additionalItems = [];
-    if (userType === "teacher") additionalItems = teacherItems;
-    else if (userType === "student") additionalItems = studentItems;
-    else if (userType === "center") additionalItems = centerItems;
-    else if (userType === "admin") additionalItems = adminItems;
-
-    return [...baseItems, ...additionalItems];
-  };
-
-  const getUserTypeLabel = () => {
-    const labels = {
-      teacher: "معلم",
-      student: "طالب",
-      center: "مركز تعليمي",
-      admin: "إدارة",
-    };
-    return labels[userType] || "مستخدم";
+    return baseItems;
   };
 
   return (
-    <div dir="rtl" className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
+    <div dir="rtl" className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-colors duration-300">
       <style>{`
         :root {
           --primary: 34 197 94;
@@ -219,25 +219,35 @@ export default function Layout({ children, currentPageName }) {
         }
       `}</style>
 
-      {currentUser ? (
-        <SidebarProvider defaultOpen={true} className="[&_[data-sidebar-overlay]]:hidden">
+      {user ? (
+        <SidebarProvider>
           <div className="min-h-screen flex w-full">
-            <Sidebar side="right" className="border-l border-orange-100 bg-white/80 backdrop-blur-sm">
-              <SidebarHeader className="border-b border-orange-100 p-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <GraduationCap className="w-6 h-6 text-white" />
+            <Sidebar side="right" className="border-l border-orange-200 dark:border-slate-700 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm transition-colors duration-300">
+              <SidebarHeader className="border-b border-orange-200 dark:border-slate-700 p-6 transition-colors duration-300">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
+                      <GraduationCap className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h2 className="font-bold text-gray-900 dark:text-white text-lg transition-colors duration-300">أستاذي</h2>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 transition-colors duration-300">منصة تعليمية</p>
+                    </div>
                   </div>
-                  <div>
-                    <h2 className="font-bold text-gray-900 text-lg">أستاذي</h2>
-                    <p className="text-xs text-gray-500">منصة تعليمية</p>
-                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setDarkMode(!darkMode)}
+                    className="hover:bg-green-600 hover:text-white transition-all"
+                  >
+                    {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                  </Button>
                 </div>
               </SidebarHeader>
               
               <SidebarContent className="p-3">
                 <SidebarGroup>
-                  <SidebarGroupLabel className="text-xs font-medium text-gray-500 uppercase tracking-wider px-3 py-2">
+                  <SidebarGroupLabel className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider px-3 py-2 transition-colors duration-300">
                     القائمة
                   </SidebarGroupLabel>
                   <SidebarGroupContent>
@@ -246,8 +256,8 @@ export default function Layout({ children, currentPageName }) {
                         <SidebarMenuItem key={item.title}>
                           <SidebarMenuButton 
                             asChild 
-                            className={`hover:bg-green-50 hover:text-green-700 transition-all duration-200 rounded-xl mb-1 ${
-                              location.pathname === item.url ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md' : ''
+                            className={`hover:bg-green-600 hover:text-white transition-all duration-200 rounded-xl mb-1 ${
+                              location.pathname === item.url ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md' : 'dark:text-white'
                             }`}
                           >
                             <Link to={item.url} className="flex items-center gap-3 px-4 py-3">
@@ -265,23 +275,23 @@ export default function Layout({ children, currentPageName }) {
                 </SidebarGroup>
               </SidebarContent>
 
-              <SidebarFooter className="border-t border-orange-100 p-4">
+              <SidebarFooter className="border-t border-orange-200 dark:border-slate-700 p-4 transition-colors duration-300">
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-amber-500 rounded-full flex items-center justify-center">
                       <span className="text-white font-bold text-sm">
-                        {currentUser?.email?.charAt(0) || 'م'}
+                        {user?.full_name?.charAt(0) || 'م'}
                       </span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-gray-900 text-sm truncate">{currentUser?.email}</p>
-                      <p className="text-xs text-gray-500 truncate">{getUserTypeLabel()}</p>
+                      <p className="font-medium text-gray-900 dark:text-white text-sm truncate transition-colors duration-300">{user?.full_name}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate transition-colors duration-300">{user?.email}</p>
                     </div>
                   </div>
                   <Button 
                     variant="outline" 
                     onClick={handleLogout}
-                    className="w-full justify-start gap-2 hover:bg-red-50 hover:text-red-600 hover:border-red-200"
+                    className="w-full justify-start gap-2 hover:bg-red-600 hover:text-white dark:border-slate-600 dark:text-white transition-all"
                   >
                     <LogOut className="w-4 h-4" />
                     تسجيل الخروج
@@ -294,14 +304,44 @@ export default function Layout({ children, currentPageName }) {
               <div className="flex-1 overflow-auto pb-20 md:pb-0">
                 {children}
               </div>
+              
+              {/* Footer */}
+              <footer className="hidden md:block border-t border-orange-200 dark:border-slate-700 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm py-4 px-6 transition-colors duration-300">
+                <div className="flex justify-center items-center gap-6 text-sm text-gray-600 dark:text-gray-400">
+                  <span>© 2026 أستاذي - جميع الحقوق محفوظة</span>
+                  <span>•</span>
+                  <Link 
+                    to={createPageUrl("PrivacyPolicy")} 
+                    className="hover:text-green-600 dark:hover:text-green-400 transition-colors"
+                  >
+                    سياسة الخصوصية | Privacy Policy
+                  </Link>
+                </div>
+              </footer>
             </main>
           </div>
           
           <MobileBottomNav />
         </SidebarProvider>
       ) : (
-        <div className="min-h-screen">
-          {children}
+        <div className="min-h-screen flex flex-col">
+          <div className="flex-1">
+            {children}
+          </div>
+          
+          {/* Public Footer */}
+          <footer className="border-t border-orange-200 dark:border-slate-700 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm py-4 px-6 transition-colors duration-300">
+            <div className="flex justify-center items-center gap-6 text-sm text-gray-600 dark:text-gray-400">
+              <span>© 2026 أستاذي - جميع الحقوق محفوظة</span>
+              <span>•</span>
+              <Link 
+                to={createPageUrl("PrivacyPolicy")} 
+                className="hover:text-green-600 dark:hover:text-green-400 transition-colors"
+              >
+                سياسة الخصوصية | Privacy Policy
+              </Link>
+            </div>
+          </footer>
         </div>
       )}
     </div>

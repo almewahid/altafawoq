@@ -1,91 +1,89 @@
 import './App.css'
-import { Toaster } from "@/components/ui/toaster"
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
+import { Toaster } from "@/components/ui/toaster"
 import VisualEditAgent from '@/lib/VisualEditAgent'
 import NavigationTracker from '@/lib/NavigationTracker'
 import { pagesConfig } from './pages.config'
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import PageNotFound from './lib/PageNotFound';
-import { AuthProvider, useAuth } from '@/lib/AuthContext';
-import UserNotRegisteredError from '@/components/UserNotRegisteredError';
-import Auth from '@/pages/Auth';
-import ProtectedRoute from '@/components/ProtectedRoute';
+import PageNotFound from './lib/PageNotFound'
+import { AuthProvider } from '@/lib/AuthContext'
+import Auth from '@/pages/Auth'
+import ProtectedRoute from '@/components/ProtectedRoute'
 
-const { Pages, Layout, mainPage } = pagesConfig;
-const mainPageKey = mainPage ?? Object.keys(Pages)[0];
-const MainPage = mainPageKey ? Pages[mainPageKey] : <></>;
+const { Pages, Layout, mainPage } = pagesConfig
 
-const LayoutWrapper = ({ children, currentPageName }) => Layout ?
-  <Layout currentPageName={currentPageName}>{children}</Layout>
-  : <>{children}</>;
+const mainPageKey = mainPage ?? Object.keys(Pages)[0]
 
-const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError, isAuthenticated, navigateToLogin } = useAuth();
+const LayoutWrapper = ({ children, currentPageName }) =>
+  Layout ? (
+    <Layout currentPageName={currentPageName}>
+      {children}
+    </Layout>
+  ) : (
+    <>{children}</>
+  )
 
-  // Show loading spinner while checking app public settings or auth
-  if (isLoadingPublicSettings || isLoadingAuth) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-
-  // Handle authentication errors
-  if (authError) {
-    if (authError.type === 'user_not_registered') {
-      return <UserNotRegisteredError />;
-    } else if (authError.type === 'auth_required') {
-      // Redirect to login automatically
-      navigateToLogin();
-      return null;
-    }
-  }
-
-  // Render the main app
+function AppRoutes() {
   return (
     <Routes>
-      {/* Public routes */}
+      {/* صفحات عامة */}
       <Route path="/auth" element={<Auth />} />
       <Route path="/login" element={<Navigate to="/auth" replace />} />
       <Route path="/register" element={<Navigate to="/auth" replace />} />
-      
-      {/* Protected routes */}
-      <Route path="/" element={
-        <ProtectedRoute>
+
+      {/* الصفحة الرئيسية */}
+      <Route
+        path="/"
+        element={
           <LayoutWrapper currentPageName={mainPageKey}>
-            <MainPage />
+            {(() => {
+              const pageConfig = Pages[mainPageKey]
+              const MainPageComponent = pageConfig?.component || pageConfig
+              return <MainPageComponent />
+            })()}
           </LayoutWrapper>
-        </ProtectedRoute>
-      } />
-      {Object.entries(Pages).map(([path, Page]) => (
-        <Route
-          key={path}
-          path={`/${path}`}
-          element={
-            <ProtectedRoute>
-              <LayoutWrapper currentPageName={path}>
-                <Page />
-              </LayoutWrapper>
-            </ProtectedRoute>
-          }
-        />
-      ))}
+        }
+      />
+
+      {/* الصفحات من pages.config */}
+      {Object.entries(Pages).map(([path, pageConfig]) => {
+        // إذا كان pageConfig هو object فيه component و protected
+        const PageComponent = pageConfig?.component || pageConfig
+        const isProtected = pageConfig?.protected || false
+
+        const content = (
+          <LayoutWrapper currentPageName={path}>
+            <PageComponent />
+          </LayoutWrapper>
+        )
+
+        return (
+          <Route
+            key={path}
+            path={`/${path}`}
+            element={
+              isProtected
+                ? <ProtectedRoute>{content}</ProtectedRoute>
+                : content
+            }
+          />
+        )
+      })}
+
+      {/* 404 */}
       <Route path="*" element={<PageNotFound />} />
     </Routes>
-  );
-};
+  )
+}
 
-
-function App() {
-
+export default function App() {
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
         <Router>
           <NavigationTracker />
-          <AuthenticatedApp />
+          <AppRoutes />
         </Router>
         <Toaster />
         <VisualEditAgent />
@@ -93,5 +91,3 @@ function App() {
     </AuthProvider>
   )
 }
-
-export default App

@@ -20,36 +20,39 @@ import TeacherCalendar from './pages/TeacherCalendar';
 import StudentCalendar from './pages/StudentCalendar';
 import GroupDetails from './pages/GroupDetails';
 import StudentProgress from './pages/StudentProgress';
+import CreateStudyGroup from './pages/CreateStudyGroup';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 import Layout from './Layout.jsx';
 
-
 export const PAGES = {
-    "Home": Home,
-    "Browse": Browse,
-    "TeacherDashboard": TeacherDashboard,
-    "TeacherGroups": TeacherGroups,
-    "TeacherCoupons": TeacherCoupons,
-    "Messages": Messages,
-    "TeacherDetails": TeacherDetails,
-    "CenterDetails": CenterDetails,
-    "StudentDashboard": StudentDashboard,
-    "StudentAssignments": StudentAssignments,
-    "AdminDashboard": AdminDashboard,
-    "Chat": Chat,
-    "VideoSession": VideoSession,
-    "CompleteProfile": CompleteProfile,
-    "EnrollGroup": EnrollGroup,
-    "EducationalServices": EducationalServices,
-    "CenterAdminDashboard": CenterAdminDashboard,
-    "TeacherWallet": TeacherWallet,
-    "TeacherCalendar": TeacherCalendar,
-    "StudentCalendar": StudentCalendar,
-    "GroupDetails": GroupDetails,
-    "StudentProgress": StudentProgress,
-}
+    home: { component: Home, protected: false },
+    browse: { component: Browse, protected: false },
+    privacypolicy: { component: PrivacyPolicy, protected: false },
+    teacherdashboard: { component: TeacherDashboard, protected: true },
+    teachergroups: { component: TeacherGroups, protected: true },
+    teachercoupons: { component: TeacherCoupons, protected: true },
+    messages: { component: Messages, protected: true },
+    teacherdetails: { component: TeacherDetails, protected: true },
+    centerdetails: { component: CenterDetails, protected: true },
+    studentdashboard: { component: StudentDashboard, protected: true },
+    studentassignments: { component: StudentAssignments, protected: true },
+    admindashboard: { component: AdminDashboard, protected: true },
+    chat: { component: Chat, protected: true },
+    videosession: { component: VideoSession, protected: true },
+    completeprofile: { component: CompleteProfile, protected: true },
+    enrollgroup: { component: EnrollGroup, protected: true },
+    educationalservices: { component: EducationalServices, protected: true },
+    centeradmindashboard: { component: CenterAdminDashboard, protected: true },
+    teacherwallet: { component: TeacherWallet, protected: true },
+    teachercalendar: { component: TeacherCalendar, protected: true },
+    studentcalendar: { component: StudentCalendar, protected: true },
+    groupdetails: { component: GroupDetails, protected: true },
+    studentprogress: { component: StudentProgress, protected: true },
+    createstudygroup: { component: CreateStudyGroup, protected: true },
+};
 
 export const pagesConfig = {
-    mainPage: "Home",
+    mainPage: 'home',
     Pages: PAGES,
     Layout: Layout,
 };
