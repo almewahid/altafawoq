@@ -11,18 +11,17 @@ export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [userType, setUserType] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
     checkUser();
 
-    // الاستماع لتغييرات المصادقة
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         await loadUserData(session.user);
       } else {
         setCurrentUser(null);
         setUserType(null);
-        setLoading(false);
       }
     });
 
@@ -31,7 +30,6 @@ export function AuthProvider({ children }) {
 
   const checkUser = async () => {
     try {
-      setLoading(true);
       const { data: { session } } = await supabase.auth.getSession();
       
       if (session?.user) {
@@ -42,32 +40,38 @@ export function AuthProvider({ children }) {
       }
     } catch (error) {
       console.error("خطأ في فحص المستخدم:", error);
+      setCurrentUser(null);
+      setUserType(null);
     } finally {
+      setInitialized(true);
       setLoading(false);
     }
   };
 
   const loadUserData = async (user) => {
     try {
-      setCurrentUser(user);
-      
-      // جلب نوع المستخدم من جدول user_profiles
+      // جلب البيانات الكاملة من user_profiles
       const { data: profile, error } = await supabase
         .from('user_profiles')
-        .select('user_type')
-        .eq('id', user.id)
-        .limit(1)
-.maybeSingle();
+        .select('*')
+        .eq('email', user.email)
+        .maybeSingle();
       
       if (error) {
         console.error("خطأ في جلب بيانات المستخدم:", error);
-        setUserType("student"); // افتراضي
-      } else {
-        setUserType(profile?.user_type || "student");
       }
+      
+      // دمج بيانات المستخدم مع البروفايل
+      setCurrentUser({ 
+        ...user, 
+        ...profile,
+        user_type: profile?.user_type || null 
+      });
+      setUserType(profile?.user_type || null);
     } catch (error) {
       console.error("خطأ في تحميل بيانات المستخدم:", error);
-      setUserType("student");
+      setCurrentUser(user);
+      setUserType(null);
     }
   };
 
@@ -75,12 +79,17 @@ export function AuthProvider({ children }) {
     currentUser,
     userType,
     loading,
+    initialized,
     refreshUser: checkUser
   };
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {initialized ? children : (
+        <div className="h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+        </div>
+      )}
     </AuthContext.Provider>
   );
 }

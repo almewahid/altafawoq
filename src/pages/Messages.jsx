@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/components/SupabaseClient";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
@@ -10,35 +11,60 @@ import ChatInterface from "@/components/chat/ChatInterface";
 export default function Messages() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  
+  const { currentUser: user, loading: authLoading } = useAuth();
 
-  const { data: user } = useQuery({
-    queryKey: ['currentUser'],
-    queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      return user;
-    },
-  });
+  console.log('🔍 User from AuthContext:', user);
+  console.log('🔍 Auth Loading:', authLoading);
 
-  // جلب المحادثات من الرسائل
   const { data: conversations = [], isLoading } = useQuery({
     queryKey: ['conversations', user?.email],
     queryFn: async () => {
+      console.log('🚀 Starting query with email:', user?.email);
+      
       if (!user?.email) return [];
 
-      // جلب كل الرسائل الخاصة بالمستخدم
-      const { data: messages } = await supabase
-        .from('chat_messages')
-        .select('*')
-        .or(`sender_email.eq.${user.email},receiver_email.eq.${user.email}`)
-        .is('group_id', null)
-        .order('created_at', { ascending: false });
+      const sessionStr = localStorage.getItem('sb-auth-token');
+      const session = JSON.parse(sessionStr);
 
-      if (!messages || messages.length === 0) return [];
+      // استعلام 1: الرسائل المرسلة
+      const sentResponse = await fetch(
+        `https://jwfawrdwlhixjjyxposq.supabase.co/rest/v1/chat_messages?sender_email=eq.${user.email}&group_id=is.null&select=*`,
+        {
+          headers: {
+            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp3ZmF3cmR3bGhpeGpqeXhwb3NxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0MTY4MDUsImV4cCI6MjA3OTk5MjgwNX0.2_bFNg5P616a33CNI_aEjgbKyZlQkmam2R4bOMh2Lck',
+            'Authorization': `Bearer ${session.access_token}`
+          }
+        }
+      );
+      const sent = await sentResponse.json();
+      console.log('📤 Sent messages:', sent);
+
+      // استعلام 2: الرسائل المستلمة
+      const receivedResponse = await fetch(
+        `https://jwfawrdwlhixjjyxposq.supabase.co/rest/v1/chat_messages?receiver_email=eq.${user.email}&group_id=is.null&select=*`,
+        {
+          headers: {
+            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp3ZmF3cmR3bGhpeGpqeXhwb3NxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ0MTY4MDUsImV4cCI6MjA3OTk5MjgwNX0.2_bFNg5P616a33CNI_aEjgbKyZlQkmam2R4bOMh2Lck',
+            'Authorization': `Bearer ${session.access_token}`
+          }
+        }
+      );
+      const received = await receivedResponse.json();
+      console.log('📥 Received messages:', received);
+
+      const allMessages = [...(Array.isArray(sent) ? sent : []), ...(Array.isArray(received) ? received : [])];
+      console.log('📦 All messages:', allMessages);
+      
+      if (allMessages.length === 0) return [];
+
+      // ترتيب الرسائل حسب التاريخ
+      allMessages.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
       // تجميع المحادثات حسب المستخدم الآخر
       const conversationsMap = new Map();
 
-      messages.forEach(msg => {
+      allMessages.forEach(msg => {
         const otherUserEmail = msg.sender_email === user.email 
           ? msg.receiver_email 
           : msg.sender_email;
@@ -51,7 +77,6 @@ export default function Messages() {
             unread: msg.receiver_email === user.email && !msg.is_read ? 1 : 0
           });
         } else {
-          // تحديث عدد الرسائل غير المقروءة
           const conv = conversationsMap.get(otherUserEmail);
           if (msg.receiver_email === user.email && !msg.is_read) {
             conv.unread += 1;
@@ -66,6 +91,8 @@ export default function Messages() {
         .select('email, full_name')
         .in('email', emails);
 
+      console.log('👥 Profiles:', profiles);
+
       // دمج البيانات
       const conversationsArray = Array.from(conversationsMap.values()).map(conv => {
         const profile = profiles?.find(p => p.email === conv.email);
@@ -76,13 +103,16 @@ export default function Messages() {
         };
       });
 
+      console.log('✅ Final conversations array:', conversationsArray);
       return conversationsArray;
     },
-    enabled: !!user?.email,
-   
+    enabled: !!user?.email && !authLoading,
   });
 
-  // فلترة المحادثات حسب البحث
+  console.log('📋 Final conversations:', conversations);
+  console.log('⏳ Is Loading:', isLoading);
+
+  // فلترة المحادثات
   const filteredConversations = conversations.filter(conv =>
     conv.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     conv.email.toLowerCase().includes(searchQuery.toLowerCase())
@@ -103,7 +133,7 @@ export default function Messages() {
     }
   }
 
-  if (isLoading) {
+  if (authLoading || isLoading) {
     return (
       <div className="h-[calc(100vh-4rem)] flex items-center justify-center m-4">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>

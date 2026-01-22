@@ -50,8 +50,8 @@ export const PAGES = {
     userlogin: { component: UserLogin, protected: false },
     privacypolicy: { component: PrivacyPolicy, protected: false },
     
-    chat: { component: Chat, protected: false },
-    messages: { component: Messages, protected: false },
+    chat: { component: Chat, protected: true },
+    messages: { component: Messages, protected: true },
     videosession: { component: VideoSession, protected: true },
     
     teacherdashboard: { component: TeacherDashboard, protected: true },
