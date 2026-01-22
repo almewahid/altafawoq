@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { supabase } from "@/components/SupabaseClient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { createPageUrl } from "@/utils";
@@ -32,41 +32,60 @@ export default function GroupChatPage() {
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me(),
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      return user;
+    },
   });
 
   const { data: group } = useQuery({
     queryKey: ['group', groupId],
     queryFn: async () => {
-      const groups = await base44.entities.StudyGroup.filter({ id: groupId });
-      return groups[0];
+      const { data } = await supabase
+        .from('study_groups')
+        .select('*')
+        .eq('id', groupId)
+        .single();
+      return data;
     },
     enabled: !!groupId,
   });
 
   const { data: enrollments = [] } = useQuery({
     queryKey: ['groupEnrollments', groupId],
-    queryFn: () => base44.entities.Enrollment.filter({ group_id: groupId }),
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('enrollments')
+        .select('*')
+        .eq('group_id', groupId);
+      return data || [];
+    },
     enabled: !!groupId,
   });
 
   const sendAnnouncementMutation = useMutation({
-    mutationFn: async (data) => {
-      // Send announcement message
-      await base44.entities.ChatMessage.create(data);
+    mutationFn: async (messageData) => {
+      // إرسال رسالة الإعلان
+      const { data: message } = await supabase
+        .from('chat_messages')
+        .insert([messageData])
+        .select()
+        .single();
       
-      // Create notifications for all students
+      // إنشاء إشعارات للطلاب
       const studentEmails = enrollments.map(e => e.student_email);
-      await Promise.all(studentEmails.map(email => 
-        base44.entities.Notification.create({
-          user_email: email,
-          title: "إعلان جديد",
-          message: `إعلان جديد في ${group?.name}`,
-          type: "announcement",
-          link: createPageUrl("GroupChat") + `?id=${groupId}`,
-          is_read: false
-        })
-      ));
+      const notifications = studentEmails.map(email => ({
+        user_email: email,
+        title: "إعلان جديد",
+        message: `إعلان جديد في ${group?.name}`,
+        type: "announcement",
+        link: createPageUrl("GroupChat") + `?id=${groupId}`,
+        is_read: false
+      }));
+      
+      await supabase.from('notifications').insert(notifications);
+      
+      return message;
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['chatMessages']);
@@ -82,10 +101,29 @@ export default function GroupChatPage() {
     if (!file) return;
 
     setUploadingFile(true);
-    const result = await base44.integrations.Core.UploadFile({ file });
-    setFileUrl(result.file_url);
-    setFileName(file.name);
-    setUploadingFile(false);
+    
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `chat-files/${fileName}`;
+
+      const { data, error } = await supabase.storage
+        .from('uploads')
+        .upload(filePath, file);
+
+      if (error) throw error;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('uploads')
+        .getPublicUrl(filePath);
+
+      setFileUrl(publicUrl);
+      setFileName(file.name);
+    } catch (error) {
+      console.error('خطأ في رفع الملف:', error);
+    } finally {
+      setUploadingFile(false);
+    }
   };
 
   const handleSendAnnouncement = () => {
