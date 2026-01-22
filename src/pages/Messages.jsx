@@ -79,7 +79,7 @@ export default function Messages() {
       return conversationsArray;
     },
     enabled: !!user?.email,
-    refetchInterval: 10000, // تحديث كل 10 ثواني
+   
   });
 
   // فلترة المحادثات حسب البحث
