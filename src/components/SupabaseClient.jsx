@@ -253,32 +253,32 @@ export const supabase = {
     },
     
     getCurrentUserWithProfile: async () => {
-      supabase.auth.getSession();
-      
-      const { data: { user }, error } = await supabase.auth.getUser();
-      if (error || !user) return null;
-      
-      try {
-        const sessionStr = localStorage.getItem('sb-auth-token') || localStorage.getItem('sb-session');
-        if (!sessionStr) return user;
-        
-        const session = JSON.parse(sessionStr);
-        const response = await fetch(`${supabaseUrl}/rest/v1/user_profiles?id=eq.${user.id}`, {
-          headers: { ...getHeaders(session.access_token), 'Accept': 'application/vnd.pgrst.object+json' }
-        });
-        
-        if (response.ok) {
-          const profile = await response.json();
-          console.log('✅ User profile loaded');
-          return { ...user, ...profile, id: user.id, email: user.email };
-        }
-        
-        return user;
-      } catch (e) {
-        console.error('⚠️ Error fetching profile:', e);
-        return user;
-      }
-    },
+  supabase.auth.getSession();
+  
+  const { data: { user }, error } = await supabase.auth.getUser();
+  if (error || !user) return null;
+  
+  try {
+    const sessionStr = localStorage.getItem('sb-auth-token') || localStorage.getItem('sb-session');
+    if (!sessionStr) return user;
+    
+    const session = JSON.parse(sessionStr);
+    const response = await fetch(`${supabaseUrl}/rest/v1/user_profiles?email=eq.${user.email}`, {
+      headers: { ...getHeaders(session.access_token), 'Accept': 'application/vnd.pgrst.object+json' }
+    });
+    
+    if (response.ok) {
+      const profile = await response.json();
+      console.log('✅ User profile loaded');
+      return { ...user, ...profile };
+    }
+    
+    return user;
+  } catch (e) {
+    console.error('⚠️ Error fetching profile:', e);
+    return user;
+  }
+},
 
     onAuthStateChange: (callback) => {
       const checkAuth = async () => {
