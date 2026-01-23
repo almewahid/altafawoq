@@ -307,30 +307,15 @@ export default function Layout({ children, currentPageName }) {
               
               {/* Footer */}
               <footer className="hidden md:block border-t border-orange-200 dark:border-slate-700 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm py-4 px-6 transition-colors duration-300">
-                <div className="flex flex-col md:flex-row justify-center items-center gap-3 md:gap-6 text-sm text-gray-600 dark:text-gray-400">
-                  <span className="font-semibold">© 2026 أستاذي - جميع الحقوق محفوظة</span>
-                  <div className="flex flex-wrap justify-center items-center gap-3 md:gap-4">
-                    <Link 
-                      to={createPageUrl("PrivacyPolicy")} 
-                      className="hover:text-green-600 dark:hover:text-green-400 transition-colors font-medium"
-                    >
-                      سياسة الخصوصية
-                    </Link>
-                    <span className="hidden md:inline">•</span>
-                    <Link 
-                      to={createPageUrl("TermsAndConditions")} 
-                      className="hover:text-green-600 dark:hover:text-green-400 transition-colors font-medium"
-                    >
-                      الشروط والأحكام
-                    </Link>
-                    <span className="hidden md:inline">•</span>
-                    <Link 
-                      to={createPageUrl("CookiesPolicy")} 
-                      className="hover:text-green-600 dark:hover:text-green-400 transition-colors font-medium"
-                    >
-                      ملفات Cookies
-                    </Link>
-                  </div>
+                <div className="flex justify-center items-center gap-6 text-sm text-gray-600 dark:text-gray-400">
+                  <span>© 2026 أستاذي - جميع الحقوق محفوظة</span>
+                  <span>•</span>
+                  <Link 
+                    to={createPageUrl("PrivacyPolicy")} 
+                    className="hover:text-green-600 dark:hover:text-green-400 transition-colors"
+                  >
+                    سياسة الخصوصية | Privacy Policy
+                  </Link>
                 </div>
               </footer>
             </main>
@@ -346,30 +331,15 @@ export default function Layout({ children, currentPageName }) {
           
           {/* Public Footer */}
           <footer className="border-t border-orange-200 dark:border-slate-700 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm py-4 px-6 transition-colors duration-300">
-            <div className="flex flex-col md:flex-row justify-center items-center gap-3 md:gap-6 text-sm text-gray-600 dark:text-gray-400">
-              <span className="font-semibold">© 2026 أستاذي - جميع الحقوق محفوظة</span>
-              <div className="flex flex-wrap justify-center items-center gap-3 md:gap-4">
-                <Link 
-                  to={createPageUrl("PrivacyPolicy")} 
-                  className="hover:text-green-600 dark:hover:text-green-400 transition-colors font-medium"
-                >
-                  سياسة الخصوصية
-                </Link>
-                <span className="hidden md:inline">•</span>
-                <Link 
-                  to={createPageUrl("TermsAndConditions")} 
-                  className="hover:text-green-600 dark:hover:text-green-400 transition-colors font-medium"
-                >
-                  الشروط والأحكام
-                </Link>
-                <span className="hidden md:inline">•</span>
-                <Link 
-                  to={createPageUrl("CookiesPolicy")} 
-                  className="hover:text-green-600 dark:hover:text-green-400 transition-colors font-medium"
-                >
-                  ملفات Cookies
-                </Link>
-              </div>
+            <div className="flex justify-center items-center gap-6 text-sm text-gray-600 dark:text-gray-400">
+              <span>© 2026 أستاذي - جميع الحقوق محفوظة</span>
+              <span>•</span>
+              <Link 
+                to={createPageUrl("PrivacyPolicy")} 
+                className="hover:text-green-600 dark:hover:text-green-400 transition-colors"
+              >
+                سياسة الخصوصية | Privacy Policy
+              </Link>
             </div>
           </footer>
         </div>

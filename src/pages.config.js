@@ -36,6 +36,8 @@ import GroupChat from './pages/GroupChat';
 import CreateStudyGroup from './pages/CreateStudyGroup';
 import CreateCoupon from './pages/CreateCoupon';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsAndConditions from './pages/TermsAndConditions';
+import CookiesPolicy from './pages/CookiesPolicy';
 import PaymentCheckout from './pages/PaymentCheckout';
 import MigrationExport from './pages/MigrationExport';
 import SessionTracking from './pages/SessionTracking';
@@ -49,6 +51,8 @@ export const PAGES = {
     register: { component: Register, protected: false },
     userlogin: { component: UserLogin, protected: false },
     privacypolicy: { component: PrivacyPolicy, protected: false },
+    termsandconditions: { component: TermsAndConditions, protected: false },
+    cookiespolicy: { component: CookiesPolicy, protected: false },
     
     chat: { component: Chat, protected: true },
     messages: { component: Messages, protected: true },

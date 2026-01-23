@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { createPageUrl } from "@/utils";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, Shield } from "lucide-react";
 
 export default function PrivacyPolicy() {
@@ -13,249 +13,181 @@ export default function PrivacyPolicy() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-colors duration-300">
-      <div className="max-w-4xl mx-auto px-4 py-8 md:py-12">
+      <div className="max-w-4xl mx-auto p-4 md:p-8">
         {/* Back Button */}
-        <Button 
-          variant="ghost" 
-          onClick={() => navigate(-1)}
-          className="mb-6 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm hover:bg-green-600 hover:text-white transition-all"
-        >
-          <ArrowRight className="w-4 h-4 ml-2" />
-          عودة
-        </Button>
-
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="flex justify-center mb-4">
-            <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg">
-              <Shield className="w-8 h-8 text-white" />
-            </div>
-          </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2 transition-colors duration-300">
-            سياسة الخصوصية
-          </h1>
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-700 dark:text-gray-300 transition-colors duration-300">
-            Privacy Policy
-          </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 transition-colors duration-300">
-            آخر تحديث: 21 يناير 2026 | Last Updated: January 21, 2026
-          </p>
+        <div className="mb-6">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate(createPageUrl("Home"))}
+            className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm hover:bg-green-600 hover:text-white"
+          >
+            <ArrowRight className="w-4 h-4 ml-2" />
+            العودة للرئيسية / Back to Home
+          </Button>
         </div>
 
-        {/* Arabic Content */}
-        <Card className="mb-8 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border-0 shadow-xl rounded-3xl transition-colors duration-300" dir="rtl">
-          <CardContent className="p-6 md:p-8">
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-300">
-              سياسة الخصوصية (العربية)
-            </h3>
-            
-            <div className="space-y-6 text-gray-700 dark:text-gray-300 leading-relaxed transition-colors duration-300">
-              <section>
-                <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 transition-colors duration-300">
-                  1. مقدمة
-                </h4>
-                <p>
-                  نحن في منصة "أستاذي" نحترم خصوصيتك ونلتزم بحماية بياناتك الشخصية. توضح هذه السياسة كيفية جمعنا واستخدامنا وحماية معلوماتك عند استخدام خدماتنا التعليمية.
-                </p>
-              </section>
+        {/* Content Card */}
+        <div className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm rounded-3xl shadow-xl p-6 md:p-10">
+          <div className="flex items-center gap-3 mb-6">
+            <Shield className="w-8 h-8 text-green-600" />
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+              سياسة الخصوصية
+            </h1>
+          </div>
+          <h2 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6">
+            Privacy Policy
+          </h2>
 
-              <section>
-                <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 transition-colors duration-300">
-                  2. البيانات التي نجمعها
-                </h4>
-                <ul className="list-disc list-inside space-y-2 mr-4">
-                  <li>معلومات الحساب: الاسم، البريد الإلكتروني، كلمة المرور</li>
-                  <li>معلومات الملف الشخصي: الصورة الشخصية، السيرة الذاتية، المؤهلات</li>
-                  <li>بيانات الاستخدام: سجل الحصص، التفاعلات، التقييمات</li>
-                  <li>معلومات الدفع: تفاصيل المعاملات المالية (مشفرة)</li>
-                </ul>
-              </section>
-
-              <section>
-                <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 transition-colors duration-300">
-                  3. كيفية استخدام البيانات
-                </h4>
-                <ul className="list-disc list-inside space-y-2 mr-4">
-                  <li>توفير وتحسين خدماتنا التعليمية</li>
-                  <li>التواصل معك بخصوص حسابك وخدماتنا</li>
-                  <li>معالجة المدفوعات والمعاملات المالية</li>
-                  <li>تحليل وتحسين تجربة المستخدم</li>
-                  <li>ضمان أمان المنصة ومنع الاحتيال</li>
-                </ul>
-              </section>
-
-              <section>
-                <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 transition-colors duration-300">
-                  4. حماية البيانات
-                </h4>
-                <p>
-                  نستخدم تقنيات التشفير المتقدمة وإجراءات الأمان لحماية بياناتك من الوصول غير المصرح به. يتم تخزين جميع البيانات الحساسة بشكل مشفر على خوادم آمنة.
-                </p>
-              </section>
-
-              <section>
-                <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 transition-colors duration-300">
-                  5. مشاركة البيانات
-                </h4>
-                <p>
-                  لا نقومببيع أو مشاركة بياناتك الشخصية مع أطراف ثالثة لأغراض تسويقية. قد نشارك البيانات فقط في الحالات التالية:
-                </p>
-                <ul className="list-disc list-inside space-y-2 mr-4 mt-2">
-                  <li>مع موافقتك الصريحة</li>
-                  <li>لتقديم الخدمات التي طلبتها</li>
-                  <li>للامتثال للقوانين واللوائح</li>
-                  <li>لحماية حقوقنا وسلامة مستخدمينا</li>
-                </ul>
-              </section>
-
-              <section>
-                <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 transition-colors duration-300">
-                  6. حقوقك
-                </h4>
-                <p>
-                  لديك الحق في:
-                </p>
-                <ul className="list-disc list-inside space-y-2 mr-4 mt-2">
-                  <li>الوصول إلى بياناتك الشخصية</li>
-                  <li>تصحيح أو تحديث معلوماتك</li>
-                  <li>حذف حسابك وبياناتك</li>
-                  <li>الاعتراض على معالجة بياناتك</li>
-                  <li>طلب نقل بياناتك</li>
-                </ul>
-              </section>
-
-              <section>
-                <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 transition-colors duration-300">
-                  7. ملفات تعريف الارتباط (Cookies)
-                </h4>
-                <p>
-                  نستخدم ملفات تعريف الارتباط لتحسين تجربتك وتذكر تفضيلاتك. يمكنك التحكم في إعدادات ملفات تعريف الارتباط من خلال متصفحك.
-                </p>
-              </section>
-
-              <section>
-                <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 transition-colors duration-300">
-                  8. التواصل معنا
-                </h4>
-                <p>
-                  إذا كان لديك أي أسئلة حول سياسة الخصوصية أو ممارساتنا، يرجى التواصل معنا عبر البريد الإلكتروني أو من خلال المنصة.
-                </p>
-              </section>
+          {/* Arabic Version */}
+          <div className="space-y-6 mb-12">
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">مقدمة</h3>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                نحن في منصة "أستاذي" نلتزم بحماية خصوصيتك وبياناتك الشخصية. توضح هذه السياسة كيفية جمع واستخدام وحماية معلوماتك عند استخدام منصتنا التعليمية.
+              </p>
             </div>
-          </CardContent>
-        </Card>
 
-        {/* English Content */}
-        <Card className="mb-8 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border-0 shadow-xl rounded-3xl transition-colors duration-300" dir="ltr">
-          <CardContent className="p-6 md:p-8">
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 transition-colors duration-300">
-              Privacy Policy (English)
-            </h3>
-            
-            <div className="space-y-6 text-gray-700 dark:text-gray-300 leading-relaxed transition-colors duration-300">
-              <section>
-                <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 transition-colors duration-300">
-                  1. Introduction
-                </h4>
-                <p>
-                  At "Ostathi" platform, we respect your privacy and are committed to protecting your personal data. This policy explains how we collect, use, and protect your information when using our educational services.
-                </p>
-              </section>
-
-              <section>
-                <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 transition-colors duration-300">
-                  2. Data We Collect
-                </h4>
-                <ul className="list-disc list-inside space-y-2 ml-4">
-                  <li>Account Information: Name, email, password</li>
-                  <li>Profile Information: Profile picture, bio, qualifications</li>
-                  <li>Usage Data: Session history, interactions, ratings</li>
-                  <li>Payment Information: Financial transaction details (encrypted)</li>
-                </ul>
-              </section>
-
-              <section>
-                <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 transition-colors duration-300">
-                  3. How We Use Your Data
-                </h4>
-                <ul className="list-disc list-inside space-y-2 ml-4">
-                  <li>Provide and improve our educational services</li>
-                  <li>Communicate with you about your account and services</li>
-                  <li>Process payments and financial transactions</li>
-                  <li>Analyze and enhance user experience</li>
-                  <li>Ensure platform security and prevent fraud</li>
-                </ul>
-              </section>
-
-              <section>
-                <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 transition-colors duration-300">
-                  4. Data Protection
-                </h4>
-                <p>
-                  We use advanced encryption technologies and security measures to protect your data from unauthorized access. All sensitive data is stored encrypted on secure servers.
-                </p>
-              </section>
-
-              <section>
-                <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 transition-colors duration-300">
-                  5. Data Sharing
-                </h4>
-                <p>
-                  We do not sell or share your personal data with third parties for marketing purposes. We may only share data in the following cases:
-                </p>
-                <ul className="list-disc list-inside space-y-2 ml-4 mt-2">
-                  <li>With your explicit consent</li>
-                  <li>To provide services you requested</li>
-                  <li>To comply with laws and regulations</li>
-                  <li>To protect our rights and user safety</li>
-                </ul>
-              </section>
-
-              <section>
-                <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 transition-colors duration-300">
-                  6. Your Rights
-                </h4>
-                <p>
-                  You have the right to:
-                </p>
-                <ul className="list-disc list-inside space-y-2 ml-4 mt-2">
-                  <li>Access your personal data</li>
-                  <li>Correct or update your information</li>
-                  <li>Delete your account and data</li>
-                  <li>Object to data processing</li>
-                  <li>Request data portability</li>
-                </ul>
-              </section>
-
-              <section>
-                <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 transition-colors duration-300">
-                  7. Cookies
-                </h4>
-                <p>
-                  We use cookies to improve your experience and remember your preferences. You can control cookie settings through your browser.
-                </p>
-              </section>
-
-              <section>
-                <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 transition-colors duration-300">
-                  8. Contact Us
-                </h4>
-                <p>
-                  If you have any questions about this Privacy Policy or our practices, please contact us via email or through the platform.
-                </p>
-              </section>
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">المعلومات التي نجمعها</h3>
+              <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
+                <li>معلومات التسجيل: الاسم، البريد الإلكتروني، رقم الهاتف</li>
+                <li>معلومات الملف الشخصي: الصورة الشخصية، المؤهلات، الخبرات</li>
+                <li>البيانات التعليمية: المواد، المراحل الدراسية، السجل الأكاديمي</li>
+                <li>معلومات الدفع: تفاصيل المعاملات المالية (مشفرة)</li>
+                <li>بيانات الاستخدام: سجلات النشاط، الحضور، التفاعل مع المحتوى</li>
+              </ul>
             </div>
-          </CardContent>
-        </Card>
 
-        {/* Back to Home Button */}
-        <div className="text-center">
-          <Button 
-            onClick={() => navigate("/")}
-            className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold transition-all shadow-lg"
-          >
-            العودة للرئيسية | Back to Home
-          </Button>
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">كيف نستخدم معلوماتك</h3>
+              <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
+                <li>توفير وتحسين خدماتنا التعليمية</li>
+                <li>التواصل معك بشأن حسابك والخدمات</li>
+                <li>معالجة المدفوعات والمعاملات المالية</li>
+                <li>تحليل وتحسين أداء المنصة</li>
+                <li>الامتثال للمتطلبات القانونية والتنظيمية</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">حماية البيانات</h3>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                نستخدم تقنيات التشفير المتقدمة وبروتوكولات الأمان لحماية بياناتك. يتم تخزين جميع المعلومات على خوادم آمنة مع نسخ احتياطية منتظمة.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">مشاركة المعلومات</h3>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                لن نشارك معلوماتك الشخصية مع أطراف ثالثة إلا في الحالات التالية:
+              </p>
+              <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300 mt-2">
+                <li>بموافقتك الصريحة</li>
+                <li>لمعالجة المدفوعات مع مزودي خدمات الدفع المعتمدين</li>
+                <li>للامتثال للمتطلبات القانونية</li>
+                <li>لحماية حقوقنا وسلامة المستخدمين</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">حقوقك</h3>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                لديك الحق في الوصول إلى بياناتك، تعديلها، حذفها، أو تقييد استخدامها. يمكنك أيضاً الاعتراض على معالجة بياناتك أو طلب نقلها.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">ملفات تعريف الارتباط (Cookies)</h3>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                نستخدم ملفات تعريف الارتباط لتحسين تجربتك، حفظ تفضيلاتك، وتحليل استخدام المنصة. يمكنك التحكم في إعدادات الكوكيز من خلال متصفحك.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">التواصل معنا</h3>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                لأي استفسارات حول سياسة الخصوصية، يرجى التواصل معنا عبر البريد الإلكتروني: privacy@ostathi.com
+              </p>
+            </div>
+          </div>
+
+          {/* English Version */}
+          <div className="border-t border-gray-200 dark:border-slate-700 pt-8 space-y-6">
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Introduction</h3>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                At Ostathi platform, we are committed to protecting your privacy and personal data. This policy explains how we collect, use, and protect your information when using our educational platform.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Information We Collect</h3>
+              <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
+                <li>Registration information: Name, email, phone number</li>
+                <li>Profile information: Profile picture, qualifications, experience</li>
+                <li>Educational data: Subjects, grades, academic records</li>
+                <li>Payment information: Financial transaction details (encrypted)</li>
+                <li>Usage data: Activity logs, attendance, content interaction</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">How We Use Your Information</h3>
+              <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
+                <li>Provide and improve our educational services</li>
+                <li>Communicate with you about your account and services</li>
+                <li>Process payments and financial transactions</li>
+                <li>Analyze and improve platform performance</li>
+                <li>Comply with legal and regulatory requirements</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Data Protection</h3>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                We use advanced encryption technologies and security protocols to protect your data. All information is stored on secure servers with regular backups.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Information Sharing</h3>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                We will not share your personal information with third parties except in the following cases:
+              </p>
+              <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300 mt-2">
+                <li>With your explicit consent</li>
+                <li>To process payments with approved payment service providers</li>
+                <li>To comply with legal requirements</li>
+                <li>To protect our rights and user safety</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Your Rights</h3>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                You have the right to access, modify, delete, or restrict the use of your data. You can also object to data processing or request data portability.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Cookies</h3>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                We use cookies to improve your experience, save your preferences, and analyze platform usage. You can control cookie settings through your browser.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Contact Us</h3>
+              <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                For any inquiries about the privacy policy, please contact us at: privacy@ostathi.com
+              </p>
+            </div>
+
+            <div className="mt-8 text-sm text-gray-600 dark:text-gray-400">
+              <p>Last updated: January 2026</p>
+              <p>آخر تحديث: يناير 2026</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
