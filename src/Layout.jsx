@@ -37,6 +37,8 @@ import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import NotificationBadge from "@/components/NotificationBadge";
 import MobileBottomNav from "@/components/MobileBottomNav";
+import ExternalLinkHandler from "@/components/ExternalLinkHandler";
+import ServiceWorkerManager from "@/components/ServiceWorkerManager";
 
 export default function Layout({ children, currentPageName }) {
   const location = useLocation();
@@ -206,7 +208,9 @@ export default function Layout({ children, currentPageName }) {
   };
 
   return (
-    <div dir="rtl" className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-colors duration-300">
+    <ExternalLinkHandler>
+      <ServiceWorkerManager />
+      <div dir="rtl" className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 transition-colors duration-300">
       <style>{`
         :root {
           --primary: 34 197 94;
@@ -330,7 +334,14 @@ export default function Layout({ children, currentPageName }) {
                     >
                       ملفات Cookies
                     </Link>
-                  </div>
+                    <span className="hidden md:inline">•</span>
+                    <Link 
+                      to={createPageUrl("Support")} 
+                      className="hover:text-green-600 dark:hover:text-green-400 transition-colors font-medium"
+                    >
+                      الدعم
+                    </Link>
+                    </div>
                 </div>
               </footer>
             </main>
@@ -369,11 +380,19 @@ export default function Layout({ children, currentPageName }) {
                 >
                   ملفات Cookies
                 </Link>
+                <span className="hidden md:inline">•</span>
+                <Link 
+                  to={createPageUrl("Support")} 
+                  className="hover:text-green-600 dark:hover:text-green-400 transition-colors font-medium"
+                >
+                  الدعم
+                </Link>
               </div>
             </div>
           </footer>
         </div>
       )}
-    </div>
+      </div>
+    </ExternalLinkHandler>
   );
 }

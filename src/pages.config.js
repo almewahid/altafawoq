@@ -41,6 +41,8 @@ import CookiesPolicy from './pages/CookiesPolicy';
 import PaymentCheckout from './pages/PaymentCheckout';
 import MigrationExport from './pages/MigrationExport';
 import SessionTracking from './pages/SessionTracking';
+import Support from './pages/Support';
+import AdminSupport from './pages/AdminSupport';
 import LayoutComponent from './Layout.jsx';
 
 export const PAGES = {
@@ -95,6 +97,9 @@ export const PAGES = {
     
     migrationexport: { component: MigrationExport, protected: true },
     sessiontracking: { component: SessionTracking, protected: true },
+    
+    "Support": Support,
+    "AdminSupport": AdminSupport,
 };
 
 export const pagesConfig = {
