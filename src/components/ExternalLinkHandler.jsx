@@ -10,6 +10,16 @@ import React from "react";
  */
 export default function ExternalLinkHandler({ children }) {
   React.useEffect(() => {
+    // Log platform info for debugging
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const isWebView = window.navigator.standalone === true || 
+                      (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+    
+    if (isIOS && isWebView) {
+      console.log('✅ External Link Handler active on iOS WebView');
+      console.log('User Agent:', navigator.userAgent);
+    }
+
     const handleClick = (e) => {
       const link = e.target.closest('a');
       

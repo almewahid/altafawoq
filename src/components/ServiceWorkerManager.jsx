@@ -23,9 +23,13 @@ export default function ServiceWorkerManager() {
     const isWebView = window.navigator.standalone === true || 
                       (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
 
+    // Additional check for iOS WebView (WKWebView detection)
+    const isWKWebView = window.webkit && window.webkit.messageHandlers;
+
     // Disable Service Worker on iOS WebView to comply with App Store guidelines
-    if (isIOS && isWebView) {
+    if (isIOS && (isWebView || isWKWebView)) {
       console.log('✅ Service Worker disabled on iOS WebView for App Store compliance');
+      console.log('Platform: iOS, WebView: true, User Agent:', navigator.userAgent);
       
       // Unregister any existing service workers on iOS
       navigator.serviceWorker.getRegistrations().then(registrations => {

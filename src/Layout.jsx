@@ -341,6 +341,13 @@ export default function Layout({ children, currentPageName }) {
                     >
                       الدعم
                     </Link>
+                    <span className="hidden md:inline">•</span>
+                    <Link 
+                      to={createPageUrl("DeleteAccount")} 
+                      className="hover:text-green-600 dark:hover:text-green-400 transition-colors font-medium"
+                    >
+                      حذف الحساب
+                    </Link>
                     </div>
                 </div>
               </footer>
@@ -386,6 +393,13 @@ export default function Layout({ children, currentPageName }) {
                   className="hover:text-green-600 dark:hover:text-green-400 transition-colors font-medium"
                 >
                   الدعم
+                </Link>
+                <span className="hidden md:inline">•</span>
+                <Link 
+                  to={createPageUrl("DeleteAccount")} 
+                  className="hover:text-green-600 dark:hover:text-green-400 transition-colors font-medium"
+                >
+                  حذف الحساب
                 </Link>
               </div>
             </div>

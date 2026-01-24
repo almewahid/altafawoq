@@ -43,6 +43,7 @@ import MigrationExport from './pages/MigrationExport';
 import SessionTracking from './pages/SessionTracking';
 import Support from './pages/Support';
 import AdminSupport from './pages/AdminSupport'; 
+import DeleteAccount from './pages/DeleteAccount';
 import LayoutComponent from './Layout.jsx';
 
 export const PAGES = {
@@ -99,7 +100,9 @@ export const PAGES = {
     sessiontracking: { component: SessionTracking, protected: true },
     
     support: { component: Support, protected: false },
-    adminsupport: { component: AdminSupport, protected: true }, 
+    adminsupport: { component: AdminSupport, protected: true },
+    
+    deleteaccount: { component: DeleteAccount, protected: true }, 
     
 };
 
