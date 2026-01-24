@@ -22,9 +22,9 @@ const getHeaders = (token = null) => {
     }
   }
 
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
+  // إضافة Authorization دائماً: إما token المستخدم أو anon key
+  headers['Authorization'] = `Bearer ${token || supabaseKey}`;
+  
   return headers;
 };
 
