@@ -42,7 +42,7 @@ import PaymentCheckout from './pages/PaymentCheckout';
 import MigrationExport from './pages/MigrationExport';
 import SessionTracking from './pages/SessionTracking';
 import Support from './pages/Support';
-import AdminSupport from './pages/AdminSupport';
+// import AdminSupport from './pages/AdminSupport'; // مؤقتاً حتى يتم رفع الملف
 import LayoutComponent from './Layout.jsx';
 
 export const PAGES = {
@@ -99,7 +99,7 @@ export const PAGES = {
     sessiontracking: { component: SessionTracking, protected: true },
     
     support: { component: Support, protected: false },
-    adminsupport: { component: AdminSupport, protected: true },
+    // adminsupport: { component: AdminSupport, protected: true }, // مؤقتاً حتى يتم رفع الملف
 };
 
 export const pagesConfig = {
