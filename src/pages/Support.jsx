@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { ArrowRight, Mail, MessageCircle, CheckCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { supabase } from "@/components/api/supabaseClient";
 
 export default function Support() {
   const navigate = useNavigate();
@@ -26,17 +27,30 @@ export default function Support() {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate submission
-    setTimeout(() => {
+    try {
+      const { error } = await supabase.from('ContactRequest').insert({
+        name: formData.name,
+        email: formData.email,
+        message: formData.message,
+        request_type: 'support',
+        status: 'معلق'
+      });
+
+      if (error) throw error;
+
       setIsSubmitted(true);
-      setIsSubmitting(false);
       setFormData({ name: "", email: "", message: "" });
       
       // Reset after 5 seconds
       setTimeout(() => {
         setIsSubmitted(false);
       }, 5000);
-    }, 1000);
+    } catch (error) {
+      console.error('Error submitting support request:', error);
+      alert('حدث خطأ أثناء إرسال الرسالة. يرجى المحاولة مرة أخرى.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

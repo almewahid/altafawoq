@@ -98,8 +98,8 @@ export const PAGES = {
     migrationexport: { component: MigrationExport, protected: true },
     sessiontracking: { component: SessionTracking, protected: true },
     
-    "Support": Support,
-    "AdminSupport": AdminSupport,
+    support: { component: Support, protected: false },
+    adminsupport: { component: AdminSupport, protected: true },
 };
 
 export const pagesConfig = {
