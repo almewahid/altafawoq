@@ -102,7 +102,7 @@ export const PAGES = {
     support: { component: Support, protected: false },
     adminsupport: { component: AdminSupport, protected: true },
     
-    deleteaccount: { component: DeleteAccount, protected: true }, 
+    deleteaccount: { component: DeleteAccount, protected: false }, 
     
 };
 
