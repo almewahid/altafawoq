@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { ArrowRight, Trash2, AlertTriangle, CheckCircle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { supabase } from "@/components/SupabaseClient";
 
 export default function DeleteAccount() {
   const navigate = useNavigate();
@@ -26,17 +27,28 @@ export default function DeleteAccount() {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate submission
-    setTimeout(() => {
+    try {
+      const { error } = await supabase.from('DeleteAccountRequest').insert({
+        email: formData.email,
+        reason: formData.reason,
+        status: 'معلق'
+      });
+
+      if (error) throw error;
+
       setIsSubmitted(true);
-      setIsSubmitting(false);
       setFormData({ email: "", reason: "" });
       
-      // Reset after 5 seconds
+      // Reset after 8 seconds
       setTimeout(() => {
         setIsSubmitted(false);
-      }, 5000);
-    }, 1000);
+      }, 8000);
+    } catch (error) {
+      console.error('Error submitting delete request:', error);
+      alert('حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
